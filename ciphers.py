@@ -18,3 +18,31 @@ def position_cipher_1(input_str):
         result += " "
         word_count += 1
     return result
+
+def cipher_by_cases_1(input_str):
+    input_arr = input_str.split()
+    result = ""
+    word_counter = 1
+    for word in input_arr:
+        letter_counter = 1
+        for letter in word:
+            num = ord(letter)
+            if num % 2 == 1:
+                if (num >= 97 and num <= 122):
+                    result += f'{chr((num-letter_counter-word_counter-97)%26 + 97)}'
+                elif (num >= 65 and num <= 90):
+                    result += f'{chr((num-letter_counter-word_counter-65)%26 + 65)}'
+                else:
+                    result += letter
+            elif num % 2 == 0:
+                if (num >= 97 and num <= 122):
+                    result += f'{chr((num+letter_counter+word_counter-97)%26 + 97)}'
+                elif (num >= 65 and num <= 90):
+                    result += f'{chr((num+letter_counter+word_counter-65)%26 + 65)}'
+                else:
+                    result += letter
+            letter_counter += 1
+        result += " "
+        word_counter += 1
+    return result
+            
