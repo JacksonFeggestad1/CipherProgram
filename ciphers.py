@@ -45,4 +45,23 @@ def cipher_by_cases_1(input_str):
         result += " "
         word_counter += 1
     return result
-            
+
+def position_cipher_2(input_str, key):
+    input_arr = input_str.split()
+    result = ""
+    counter = 1
+    loop_counter = 1
+    for word in input_arr:
+        for letter in word:
+            num = ord(letter)
+            if (num >= 97 and num <= 122):
+                result += f'{chr((num-97+counter+loop_counter)%26+97)}'
+            elif (num >= 65 and num <= 90):
+                result += f'{chr((num-65+counter+loop_counter)%26+65)}'
+            else:
+                result += letter
+            counter = counter + 1 % key
+            if counter == 0:
+                loop_counter += 1
+        result += " "
+    return result
