@@ -1,16 +1,18 @@
 from tkinter import *
-from ciphers import position_cipher_1
+from ciphers import position_cipher_1, cipher_by_cases_1
 
 CIPHER_MODE = 0
 
-ciphers = [position_cipher_1]
-cipher_options = ["Staircase Cipher"]
+ciphers = [position_cipher_1, cipher_by_cases_1]
+cipher_options = ["Staircase Cipher", "Cipher in Parts"]
 
 def activate_cipher():
     output_field.delete('1.0','end')
     output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end')))
 
 def update_selection(selection_str):
+    global CIPHER_MODE
+    output_field.delete('1.0','end')
     CIPHER_MODE = cipher_options.index(selection_str)
 
 root = Tk()
