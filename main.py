@@ -8,9 +8,9 @@ ciphers = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
 cipher_options = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
 
 def activate_cipher():
-    global output_field, key_error, key_field, input_field, CIPHER_MODE, NEED_KEY
+    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY
     output_field.delete('1.0','end')
-    key_error.grid_remove()
+    hide_errors()
 
     if NEED_KEY:
         key = key_field.get('1.0','end')[:-1]
@@ -24,8 +24,8 @@ def activate_cipher():
         output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end')))
 
 def update_selection(selection_str):
-    global CIPHER_MODE, key_field, key_label, key_error, NEED_KEY
-    key_error.grid_remove()
+    global CIPHER_MODE, key_field, key_label, NEED_KEY
+    hide_errors()
 
     output_field.delete('1.0','end')
     CIPHER_MODE = cipher_options.index(selection_str)
@@ -41,6 +41,26 @@ def update_selection(selection_str):
     else:
         key_field.grid_remove()
         key_label.grid_remove()
+    return
+
+def copy_output_to_clipboard():
+    global output_field, root
+    hide_errors()
+    root.clipboard_clear()
+    root.clipboard_append(output_field.get('1.0', 'end'))
+    return
+
+def save_output_as_file():
+    global file_name, output_field
+    hide_errors()
+    file_error_label.grid_remove()
+    file_name_str = file_name.get('1.0','end')[:-1]
+    file = open(file_name_str, "w")
+    if file.closed:
+        file_error_label.grid()
+        return 
+    file.write(output_field.get('1.0','end'))
+    file.close()
     return
 
 root = Tk()
@@ -114,7 +134,16 @@ output_field.insert(END, "Your output here.")
 
 output_save_frame = Frame(right_frame)
 
-copy_button = Button(output_save_frame, text = "Copy Output to Clipboard")
+copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard)
+
+save_as_file_frame = Frame(output_save_frame)
+
+file_name = Text(save_as_file_frame, height=1, width=10)
+file_name.insert(END, "File Name")
+
+file_save_button = Button(save_as_file_frame, text = "Save Output to File", command=save_output_as_file)
+
+file_error_label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
 
 #-------Position Right Frame------
 
@@ -123,6 +152,18 @@ right_frame.grid(row = 1, column = 2)
 output_label.grid(row = 1, column = 0)
 
 output_field.grid(row = 2, column = 0)
+
+output_save_frame.grid(row = 3, column = 0)
+
+copy_button.grid(row = 0, column = 0)
+
+save_as_file_frame.grid(row = 0, column = 1)
+
+file_name.grid(row = 0, column = 0)
+
+file_save_button.grid(row = 1, column = 0)
+
+file_error_label.grid(row = 2, column = 0)
 
 #-----------Title-----------------
 title_label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
@@ -133,5 +174,13 @@ title_label.grid(row = 0, column = 1)
 key_field.grid_remove()
 key_label.grid_remove()
 key_error.grid_remove()
+file_error_label.grid_remove()
+
+error_messages = [key_error, file_error_label]
+
+def hide_errors():
+    global error_messages
+    for m in error_messages:
+        m.grid_remove()
 
 root.mainloop()
