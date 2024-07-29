@@ -77,14 +77,14 @@ right_frame = Frame(root)
 input_field = Text(left_frame, height=3, width=30)
 input_field.insert(END, "Enter your input here.")
 
-input_label = Label(left_frame, text="Input", font=("Impact",12))
+input_label = Label(left_frame, text="Input", font=("Impact",16))
 
 key_field = Text(left_frame, height=2, width = 20)
 key_field.insert(END, "Enter your key here.")
 
-key_label = Label(left_frame, text="Key", font=("Impact", 10))
+key_label = Label(left_frame, text="Key", font=("Impact", 13))
 
-key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",10), fg='#f00')
+key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",13), fg='#f00')
 
 #-------Position Left Frame-------
 
@@ -127,7 +127,7 @@ cipher_selection.grid(row = 0, column = 1)
 
 #-------Populate Right Frame------
 
-output_label = Label(right_frame, text="Output", font=("Impact", 12))
+output_label = Label(right_frame, text="Output", font=("Impact", 16))
 
 output_field = Text(right_frame, height=3, width=30)
 output_field.insert(END, "Your output here.")
