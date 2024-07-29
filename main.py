@@ -140,10 +140,10 @@ spaces_var = IntVar()
 spaces_option = Checkbutton(options_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
 
 grammar_var = IntVar()
-grammar_option = Checkbutton(options_frame, text = "Ignore Grammatical\nSymbols", variable=grammar_var)
+grammar_option = Checkbutton(options_frame, text = "Ignore Grammatical Symbols", variable=grammar_var)
 
 capital_var = IntVar()
-capital_option = Checkbutton(options_frame, text = "Ignore\nCapitalization", variable = capital_var)
+capital_option = Checkbutton(options_frame, text = "Ignore Capitalization", variable = capital_var)
 
 #------Position Central Frame-----
 
