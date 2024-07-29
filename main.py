@@ -63,6 +63,15 @@ def save_output_as_file():
     file.close()
     return
 
+def input_to_output_copy():
+    global input_field, output_field
+    hide_errors()
+
+    input_field.delete('1.0','end')
+    input_field.insert(END, output_field.get('1.0','end')[:-1])
+    output_field.delete('1.0','end')
+    return
+
 root = Tk()
 root.geometry("950x400")
 root.minsize(950, 400)
@@ -90,6 +99,8 @@ key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",13), fg
 
 left_frame.grid(row = 1, column = 0)
 
+#    <<<<<Left Frame>>>>>
+
 input_label.grid(row = 1, column = 0)
 
 key_label.grid(row = 3, column = 0)
@@ -116,12 +127,17 @@ cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, co
 
 central_frame.grid(row = 1, column = 1)
 
+#    <<<<<Central Frame>>>>>
+
 encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
 
 cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
 
+exit_button.grid(row=2, column = 0)
+
+#    <<<<<Cipher Frame>>>>>
+
 cipher_button.grid(row = 0, column = 0)
-exit_button.grid(row=5, column = 0)
 
 cipher_selection.grid(row = 0, column = 1)
 
@@ -136,29 +152,36 @@ output_save_frame = Frame(right_frame)
 
 copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard)
 
-save_as_file_frame = Frame(output_save_frame)
+file_save_frame = Frame(output_save_frame)
 
-file_name = Text(save_as_file_frame, height=1, width=10)
+file_name = Text(file_save_frame, height=1, width=10)
 file_name.insert(END, "File Name")
 
-file_save_button = Button(save_as_file_frame, text = "Save Output to File", command=save_output_as_file)
+file_save_button = Button(file_save_frame, text = "Save Output to File", command=save_output_as_file)
 
 file_error_label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
+
+output_to_input_button = Button(output_save_frame, text = "Copy Output\nto Input", command = input_to_output_copy)
 
 #-------Position Right Frame------
 
 right_frame.grid(row = 1, column = 2)
 
+#    <<<<<Right Frame>>>>>
 output_label.grid(row = 1, column = 0)
 
 output_field.grid(row = 2, column = 0)
 
 output_save_frame.grid(row = 3, column = 0)
 
+#    <<<<<Output Save Frame>>>>>
 copy_button.grid(row = 0, column = 0)
 
-save_as_file_frame.grid(row = 0, column = 1)
+output_to_input_button.grid(row = 0, column = 1)
 
+file_save_frame.grid(row = 0, column = 2)
+
+#    <<<<<File Save Frame>>>>>
 file_name.grid(row = 0, column = 0)
 
 file_save_button.grid(row = 1, column = 0)
