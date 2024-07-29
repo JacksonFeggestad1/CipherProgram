@@ -64,9 +64,9 @@ def save_output_as_file():
     return
 
 root = Tk()
-root.geometry("800x300")
-root.minsize(800, 300)
-root.maxsize(800, 300)
+root.geometry("950x400")
+root.minsize(950, 400)
+root.maxsize(950, 400)
 
 #-------------Frames--------------
 left_frame = Frame(root)
@@ -74,7 +74,7 @@ central_frame = Frame(root)
 right_frame = Frame(root)
 
 #-------Populate Left Frame-------
-input_field = Text(left_frame, height=3, width=30)
+input_field = Text(left_frame, height=10, width=40)
 input_field.insert(END, "Enter your input here.")
 
 input_label = Label(left_frame, text="Input", font=("Impact",16))
@@ -129,7 +129,7 @@ cipher_selection.grid(row = 0, column = 1)
 
 output_label = Label(right_frame, text="Output", font=("Impact", 16))
 
-output_field = Text(right_frame, height=3, width=30)
+output_field = Text(right_frame, height=10, width=40)
 output_field.insert(END, "Your output here.")
 
 output_save_frame = Frame(right_frame)
