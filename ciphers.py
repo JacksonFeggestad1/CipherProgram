@@ -5,6 +5,8 @@ def position_cipher_1(input_str, options):
     result = ""
     word_count = 1
     for word in input_arr:
+        if options[2] == 1:
+            word = word.lower()
         letter_count = 1
         for letter in word:
             num = ord(letter)
@@ -26,6 +28,8 @@ def cipher_by_cases_1(input_str, options):
     result = ""
     word_counter = 1
     for word in input_arr:
+        if options[2] == 1:
+            word = word.lower()
         letter_counter = 1
         for letter in word:
             num = ord(letter)
@@ -57,6 +61,8 @@ def position_cipher_2(input_str, key, options):
     result = ""
     counter, prev_counter, loop_counter = 1, 1, 1
     for word in input_arr:
+        if options[2] == 1:
+            word = word.lower()
         for letter in word:
             num = ord(letter)
             prev_counter = counter

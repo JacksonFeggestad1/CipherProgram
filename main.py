@@ -8,9 +8,11 @@ ciphers = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
 cipher_options = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
 
 def activate_cipher():
-    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY, spaces_var, grammar_var
+    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY, spaces_var, grammar_var, capital_var
     output_field.delete('1.0','end')
     hide_errors()
+
+    options = [spaces_var.get(), grammar_var.get(), capital_var.get()]
 
     if NEED_KEY:
         key = key_field.get('1.0','end')[:-1]
@@ -18,15 +20,15 @@ def activate_cipher():
         if not key.isnumeric():
             key_error.grid()
         else:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), [spaces_var.get(), grammar_var.get()]))
+            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options))
             return
 
     else:
-        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),[spaces_var.get(), grammar_var.get()]))
+        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options))
         return
 
 def update_selection(selection_str):
-    global CIPHER_MODE, key_field, key_label, NEED_KEY, spaces_option, grammar_option
+    global CIPHER_MODE, key_field, key_label, NEED_KEY, spaces_option
     hide_errors()
 
     output_field.delete('1.0','end')
@@ -132,13 +134,16 @@ selected_cipher = StringVar()
 selected_cipher.set(cipher_options[0])
 cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_selection(x))
 
-spaces_grammar_frame = Frame(central_frame)
+options_frame = Frame(central_frame)
 
 spaces_var = IntVar()
-spaces_option = Checkbutton(spaces_grammar_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
+spaces_option = Checkbutton(options_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
 
 grammar_var = IntVar()
-grammar_option = Checkbutton(spaces_grammar_frame, text = "Ignore Grammatical\nSymbols", variable=grammar_var)
+grammar_option = Checkbutton(options_frame, text = "Ignore Grammatical\nSymbols", variable=grammar_var)
+
+capital_var = IntVar()
+capital_option = Checkbutton(options_frame, text = "Ignore\nCapitalization", variable = capital_var)
 
 #------Position Central Frame-----
 
@@ -150,7 +155,7 @@ encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
 
 cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
 
-spaces_grammar_frame.grid(row = 2, column = 0)
+options_frame.grid(row = 2, column = 0)
 
 exit_button.grid(row=3, column = 0, pady = (30, 0))
 
@@ -160,11 +165,13 @@ cipher_button.grid(row = 0, column = 0)
 
 cipher_selection.grid(row = 0, column = 1)
 
-#    <<<<<Spaces Grammar Frame>>>>>
+#    <<<<<Options Frame>>>>>
 
 spaces_option.grid(row = 0, column = 0)
 
 grammar_option.grid(row = 1, column = 0)
+
+capital_option.grid(row = 2, column = 0)
 
 #-------Populate Right Frame------
 
