@@ -8,7 +8,7 @@ ciphers = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
 cipher_options = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
 
 def activate_cipher():
-    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY
+    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY, spaces_var, grammar_var
     output_field.delete('1.0','end')
     hide_errors()
 
@@ -18,13 +18,15 @@ def activate_cipher():
         if not key.isnumeric():
             key_error.grid()
         else:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key)))
+            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), [spaces_var.get(), grammar_var.get()]))
+            return
 
     else:
-        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end')))
+        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),[spaces_var.get(), grammar_var.get()]))
+        return
 
 def update_selection(selection_str):
-    global CIPHER_MODE, key_field, key_label, NEED_KEY
+    global CIPHER_MODE, key_field, key_label, NEED_KEY, spaces_option, grammar_option
     hide_errors()
 
     output_field.delete('1.0','end')
@@ -41,6 +43,14 @@ def update_selection(selection_str):
     else:
         key_field.grid_remove()
         key_label.grid_remove()
+
+    if CIPHER_MODE in [0,1]:
+        spaces_option.deselect()
+        spaces_option.config(state=DISABLED)
+    elif CIPHER_MODE in [2]:
+        spaces_option.config(state=ACTIVE)
+
+
     return
 
 def copy_output_to_clipboard():
@@ -61,6 +71,15 @@ def save_output_as_file():
         return 
     file.write(output_field.get('1.0','end'))
     file.close()
+    return
+
+def input_to_output_copy():
+    global input_field, output_field
+    hide_errors()
+
+    input_field.delete('1.0','end')
+    input_field.insert(END, output_field.get('1.0','end')[:-1])
+    output_field.delete('1.0','end')
     return
 
 root = Tk()
@@ -90,6 +109,8 @@ key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",13), fg
 
 left_frame.grid(row = 1, column = 0)
 
+#    <<<<<Left Frame>>>>>
+
 input_label.grid(row = 1, column = 0)
 
 key_label.grid(row = 3, column = 0)
@@ -111,19 +132,39 @@ selected_cipher = StringVar()
 selected_cipher.set(cipher_options[0])
 cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_selection(x))
 
+spaces_grammar_frame = Frame(central_frame)
+
+spaces_var = IntVar()
+spaces_option = Checkbutton(spaces_grammar_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
+
+grammar_var = IntVar()
+grammar_option = Checkbutton(spaces_grammar_frame, text = "Ignore Grammatical\nSymbols", variable=grammar_var)
 
 #------Position Central Frame-----
 
 central_frame.grid(row = 1, column = 1)
 
+#    <<<<<Central Frame>>>>>
+
 encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
 
 cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
 
+spaces_grammar_frame.grid(row = 2, column = 0)
+
+exit_button.grid(row=3, column = 0, pady = (30, 0))
+
+#    <<<<<Cipher Frame>>>>>
+
 cipher_button.grid(row = 0, column = 0)
-exit_button.grid(row=5, column = 0)
 
 cipher_selection.grid(row = 0, column = 1)
+
+#    <<<<<Spaces Grammar Frame>>>>>
+
+spaces_option.grid(row = 0, column = 0)
+
+grammar_option.grid(row = 1, column = 0)
 
 #-------Populate Right Frame------
 
@@ -136,29 +177,36 @@ output_save_frame = Frame(right_frame)
 
 copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard)
 
-save_as_file_frame = Frame(output_save_frame)
+file_save_frame = Frame(output_save_frame)
 
-file_name = Text(save_as_file_frame, height=1, width=10)
+file_name = Text(file_save_frame, height=1, width=10)
 file_name.insert(END, "File Name")
 
-file_save_button = Button(save_as_file_frame, text = "Save Output to File", command=save_output_as_file)
+file_save_button = Button(file_save_frame, text = "Save Output to File", command=save_output_as_file)
 
 file_error_label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
+
+output_to_input_button = Button(output_save_frame, text = "Copy Output\nto Input", command = input_to_output_copy)
 
 #-------Position Right Frame------
 
 right_frame.grid(row = 1, column = 2)
 
+#    <<<<<Right Frame>>>>>
 output_label.grid(row = 1, column = 0)
 
 output_field.grid(row = 2, column = 0)
 
 output_save_frame.grid(row = 3, column = 0)
 
+#    <<<<<Output Save Frame>>>>>
 copy_button.grid(row = 0, column = 0)
 
-save_as_file_frame.grid(row = 0, column = 1)
+output_to_input_button.grid(row = 0, column = 1)
 
+file_save_frame.grid(row = 0, column = 2)
+
+#    <<<<<File Save Frame>>>>>
 file_name.grid(row = 0, column = 0)
 
 file_save_button.grid(row = 1, column = 0)
