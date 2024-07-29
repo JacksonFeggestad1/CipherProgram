@@ -41,51 +41,93 @@ def update_selection(selection_str):
     else:
         key_field.grid_remove()
         key_label.grid_remove()
+    return
 
 root = Tk()
 root.geometry("800x300")
 root.minsize(800, 300)
 root.maxsize(800, 300)
 
-#-------------Labels--------------
-title_label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
-input_label = Label(root, text="Input", font=("Impact",12))
-output_label = Label(root, text="Output", font=("Impact", 12))
-key_label = Label(root, text="Key", font=("Impact", 10))
-key_error = Label(root, text="Key Must Be Numeric", font=("Impact",10), fg='#f00')
+#-------------Frames--------------
+left_frame = Frame(root)
+central_frame = Frame(root)
+right_frame = Frame(root)
 
-#-----------Text Fields-----------
-input_field = Text(root, height=3, width=30)
+#-------Populate Left Frame-------
+input_field = Text(left_frame, height=3, width=30)
 input_field.insert(END, "Enter your input here.")
 
-output_field = Text(root, height=3, width=30)
-output_field.insert(END, "Your output here.")
+input_label = Label(left_frame, text="Input", font=("Impact",12))
 
-key_field = Text(root, height=2, width = 20)
+key_field = Text(left_frame, height=2, width = 20)
 key_field.insert(END, "Enter your key here.")
 
-#------------Buttons--------------
-cipher_button = Button(root, text="Activate Cipher", command=activate_cipher)
+key_label = Label(left_frame, text="Key", font=("Impact", 10))
 
-#-----------Drop Down-------------
-selected_cipher = StringVar()
-selected_cipher.set(cipher_options[0])
-cipher_selection = OptionMenu(root, selected_cipher, *cipher_options, command=lambda x: update_selection(x))
+key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",10), fg='#f00')
 
-#---------Grid Positioning--------
-title_label.grid(row = 0, column = 1)
+#-------Position Left Frame-------
+
+left_frame.grid(row = 1, column = 0)
+
 input_label.grid(row = 1, column = 0)
-output_label.grid(row = 1, column = 2)
+
 key_label.grid(row = 3, column = 0)
 key_error.grid(row=5, column = 0)
 
 input_field.grid(row = 2, column = 0)
-output_field.grid(row = 2, column = 2)
 key_field.grid(row = 4, column = 0)
 
-cipher_button.grid(row = 2, column = 1)
+#------Populate Central Frame-----
+cipher_frame = Frame(central_frame)
 
-cipher_selection.grid(row = 3, column = 1)
+cipher_button = Button(cipher_frame, text="Activate Cipher", command=activate_cipher)
+
+exit_button = Button(central_frame, text = "Exit", command=root.quit)
+
+encrypt_decrypt_mode_label = Label(central_frame, text = "Mode: Encrypt")
+
+selected_cipher = StringVar()
+selected_cipher.set(cipher_options[0])
+cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_selection(x))
+
+
+#------Position Central Frame-----
+
+central_frame.grid(row = 1, column = 1)
+
+encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
+
+cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
+
+cipher_button.grid(row = 0, column = 0)
+exit_button.grid(row=5, column = 0)
+
+cipher_selection.grid(row = 0, column = 1)
+
+#-------Populate Right Frame------
+
+output_label = Label(right_frame, text="Output", font=("Impact", 12))
+
+output_field = Text(right_frame, height=3, width=30)
+output_field.insert(END, "Your output here.")
+
+output_save_frame = Frame(right_frame)
+
+copy_button = Button(output_save_frame, text = "Copy Output to Clipboard")
+
+#-------Position Right Frame------
+
+right_frame.grid(row = 1, column = 2)
+
+output_label.grid(row = 1, column = 0)
+
+output_field.grid(row = 2, column = 0)
+
+#-----------Title-----------------
+title_label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
+title_label.grid(row = 0, column = 1)
+
 
 #------Make Things Invisible------
 key_field.grid_remove()
