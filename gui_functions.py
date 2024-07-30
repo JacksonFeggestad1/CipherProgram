@@ -4,7 +4,6 @@ key_info = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\n
 
 def activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages):
     output_field.delete('1.0','end')
-    key_field.delete('1.0','end')
     hide_errors(error_messages)
 
     options = [spaces_var.get(), grammar_var.get(), capital_var.get()]
@@ -27,6 +26,7 @@ def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label,
     hide_errors(error_messages)
 
     output_field.delete('1.0','end')
+    key_field.delete('1.0','end')
     CIPHER_MODE = cipher_options.index(selection_str)
 
     key_info_display.update_text(key_info[CIPHER_MODE])
