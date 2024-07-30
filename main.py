@@ -14,8 +14,8 @@ def activate_cipher_helper():
     return 
 
 def update_helper(selection_str):
-    global CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages
-    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages)
+    global CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, spaces_option, output_field, cipher_options, error_messages
+    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, spaces_option, output_field, cipher_options, error_messages)
     return
 
 def copy_output_to_clipboard_helper():
@@ -54,7 +54,7 @@ key_field.insert(END, "Enter your key here.")
 
 key_label = Label(left_frame, text="Key", font=("Impact", 13))
 
-key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",13), fg='#f00')
+key_error = Label(left_frame, text="Key Is Invalid", font=("Impact",13), fg='#f00')
 
 #-------Position Left Frame-------
 
@@ -65,6 +65,7 @@ left_frame.grid(row = 1, column = 0)
 input_label.grid(row = 1, column = 0)
 
 key_label.grid(row = 3, column = 0)
+key_info_display = create_tool_tip(key_label, text = key_info[CIPHER_MODE])
 key_error.grid(row=5, column = 0)
 
 input_field.grid(row = 2, column = 0)
