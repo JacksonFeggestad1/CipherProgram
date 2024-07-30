@@ -1,5 +1,6 @@
 from tkinter import *
-from ciphers import position_cipher_1, cipher_by_cases_1, position_cipher_2
+from ciphers import *
+from gui_functions import *
 
 CIPHER_MODE = 0
 NEED_KEY = False
@@ -7,81 +8,29 @@ NEED_KEY = False
 ciphers = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
 cipher_options = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
 
-def activate_cipher():
-    global output_field, key_field, input_field, CIPHER_MODE, NEED_KEY, spaces_var, grammar_var, capital_var
-    output_field.delete('1.0','end')
-    hide_errors()
+def activate_cipher_helper():
+    global CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages
+    activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages)
+    return 
 
-    options = [spaces_var.get(), grammar_var.get(), capital_var.get()]
-
-    if NEED_KEY:
-        key = key_field.get('1.0','end')[:-1]
-
-        if not key.isnumeric():
-            key_error.grid()
-        else:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options))
-            return
-
-    else:
-        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options))
-        return
-
-def update_selection(selection_str):
-    global CIPHER_MODE, key_field, key_label, NEED_KEY, spaces_option
-    hide_errors()
-
-    output_field.delete('1.0','end')
-    CIPHER_MODE = cipher_options.index(selection_str)
-
-    if CIPHER_MODE in [0,1]:
-        NEED_KEY = False
-    elif CIPHER_MODE in [2]:
-        NEED_KEY = True
-
-    if NEED_KEY:
-        key_field.grid()
-        key_label.grid()
-    else:
-        key_field.grid_remove()
-        key_label.grid_remove()
-
-    if CIPHER_MODE in [0,1]:
-        spaces_option.deselect()
-        spaces_option.config(state=DISABLED)
-    elif CIPHER_MODE in [2]:
-        spaces_option.config(state=ACTIVE)
-
-
+def update_helper(selection_str):
+    global CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages
+    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages)
     return
 
-def copy_output_to_clipboard():
-    global output_field, root
-    hide_errors()
-    root.clipboard_clear()
-    root.clipboard_append(output_field.get('1.0', 'end'))
+def copy_output_to_clipboard_helper():
+    global root, output_field, error_messages
+    copy_output_to_clipboard(root, output_field, error_messages)
     return
 
-def save_output_as_file():
-    global file_name, output_field
-    hide_errors()
-    file_error_label.grid_remove()
-    file_name_str = file_name.get('1.0','end')[:-1]
-    file = open(file_name_str, "w")
-    if file.closed:
-        file_error_label.grid()
-        return 
-    file.write(output_field.get('1.0','end'))
-    file.close()
+def save_output_as_file_helper():
+    global file_name, output_field, error_messages
+    save_output_as_file(file_name, output_field, error_messages)
     return
 
-def input_to_output_copy():
-    global input_field, output_field
-    hide_errors()
-
-    input_field.delete('1.0','end')
-    input_field.insert(END, output_field.get('1.0','end')[:-1])
-    output_field.delete('1.0','end')
+def input_to_output_copy_helper():
+    global input_field, output_field, error_messages
+    input_to_output_copy(input_field, output_field, error_messages)
     return
 
 root = Tk()
@@ -124,7 +73,7 @@ key_field.grid(row = 4, column = 0)
 #------Populate Central Frame-----
 cipher_frame = Frame(central_frame)
 
-cipher_button = Button(cipher_frame, text="Activate Cipher", command=activate_cipher)
+cipher_button = Button(cipher_frame, text="Activate Cipher", command=activate_cipher_helper)
 
 exit_button = Button(central_frame, text = "Exit", command=root.quit)
 
@@ -132,7 +81,7 @@ encrypt_decrypt_mode_label = Label(central_frame, text = "Mode: Encrypt")
 
 selected_cipher = StringVar()
 selected_cipher.set(cipher_options[0])
-cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_selection(x))
+cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(x))
 
 options_frame = Frame(central_frame)
 
@@ -182,18 +131,18 @@ output_field.insert(END, "Your output here.")
 
 output_save_frame = Frame(right_frame)
 
-copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard)
+copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard_helper)
 
 file_save_frame = Frame(output_save_frame)
 
 file_name = Text(file_save_frame, height=1, width=10)
 file_name.insert(END, "File Name")
 
-file_save_button = Button(file_save_frame, text = "Save Output to File", command=save_output_as_file)
+file_save_button = Button(file_save_frame, text = "Save Output to File", command=save_output_as_file_helper)
 
 file_error_label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
 
-output_to_input_button = Button(output_save_frame, text = "Copy Output\nto Input", command = input_to_output_copy)
+output_to_input_button = Button(output_save_frame, text = "Copy Output\nto Input", command = input_to_output_copy_helper)
 
 #-------Position Right Frame------
 
