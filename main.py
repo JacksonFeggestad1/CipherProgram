@@ -36,8 +36,8 @@ def input_to_output_copy_helper():
 
 root = Tk()
 root.geometry("950x400")
-#root.minsize(950, 400)
-#root.maxsize(950, 400)
+root.minsize(950, 400)
+root.maxsize(950, 400)
 
 #-------------Frames--------------
 left_frame = Frame(root)
