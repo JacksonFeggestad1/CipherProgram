@@ -22,7 +22,7 @@ def activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field,
         return
     return
 
-def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, spaces_option, output_field, cipher_options, error_messages):
+def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages):
     hide_errors(error_messages)
 
     output_field.delete('1.0','end')
@@ -38,9 +38,11 @@ def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label,
     if NEED_KEY:
         key_field.grid()
         key_label.grid()
+        info_icon.grid()
     else:
         key_field.grid_remove()
         key_label.grid_remove()
+        info_icon.grid_remove()
 
     if CIPHER_MODE in [0,1]:
         spaces_option.deselect()
