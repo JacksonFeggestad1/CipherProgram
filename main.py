@@ -1,199 +1,190 @@
 from tkinter import *
+from typing import Callable
 from PIL import Image, ImageTk
 from ciphers import *
 from gui_functions import *
 
-CIPHER_MODE = 0
-NEED_KEY = False
+CIPHER_MODE: int = 0
+NEED_KEY: bool = False
 
-ciphers = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
-cipher_options = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
+ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
+cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
 
-def activate_cipher_helper():
-    global CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages
-    activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages)
-    return 
-
-def update_helper(selection_str):
-    global CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages
-    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages)
+'''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
+def update_helper(selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,
+                  options_gui_elements: list[Checkbutton], output_field: Text, error_messages: list[Label]) -> None:
+    global CIPHER_MODE, NEED_KEY, cipher_options
+    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_messages)
     return
 
-def copy_output_to_clipboard_helper():
-    global root, output_field, error_messages
-    copy_output_to_clipboard(root, output_field, error_messages)
+def main() -> None:
+    root: Tk = Tk()
+    root.geometry("950x400")
+    root.minsize(950, 400)
+    root.maxsize(950, 400)
+
+    #-------------Frames--------------
+    left_frame: Frame = Frame(root)
+    central_frame: Frame = Frame(root)
+    right_frame: Frame = Frame(root)
+
+    #-------Populate Left Frame-------
+    input_field: Text = Text(left_frame, height=10, width=40)
+    input_field.insert(END, "Enter your input here.")
+
+    input_label: Label = Label(left_frame, text="Input", font=("Impact",16))
+
+    key_field: Text = Text(left_frame, height=2, width = 20)
+    key_field.insert(END, "Enter your key here.")
+
+    key_label_frame: Frame = Frame(left_frame)
+
+    key_label: Label = Label(key_label_frame, text="Key", font=("Impact", 13))
+
+    info_img: ImageTk = ImageTk.PhotoImage(Image.open("icons/info_icon.png"))
+    info_icon: Label = Label(key_label_frame, image = info_img)
+    key_info_display: Tool_Tip = create_tool_tip(info_icon, text = key_info[CIPHER_MODE])
+
+    key_error: Label = Label(left_frame, text="Key Is Invalid", font=("Impact",13), fg='#f00')
+
+    #-------Position Left Frame-------
+
+    left_frame.grid(row = 1, column = 0)
+
+    #    <<<<<Left Frame>>>>>
+
+    input_label.grid(row = 1, column = 0)
+
+    key_label_frame.grid(row = 3, column = 0)
+
+    key_error.grid(row=5, column = 0)
+
+    input_field.grid(row = 2, column = 0)
+    key_field.grid(row = 4, column = 0)
+
+    #    <<<<<Key Info Frame>>>>>
+
+    key_label.grid(row = 0, column = 0)
+
+    info_icon.grid(row = 0, column = 1)
+
+    #------Populate Central Frame-----
+    cipher_frame: Frame = Frame(central_frame)
+
+    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, options_vars, error_messages))
+
+    exit_button: Button = Button(central_frame, text = "Exit", command=root.quit)
+
+    encrypt_decrypt_mode_label: Label = Label(central_frame, text = "Mode: Encrypt")
+
+    selected_cipher: StringVar = StringVar()
+    selected_cipher.set(cipher_options[0])
+    cipher_selection: OptionMenu = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(x, key_field, key_label, key_info_display, info_icon, options_gui_elements,
+                                                                                                                              output_field, error_messages))
+
+    options_frame: Frame = Frame(central_frame)
+
+    spaces_var: IntVar = IntVar()
+    spaces_option: Checkbutton = Checkbutton(options_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
+
+    grammar_var: IntVar = IntVar()
+    grammar_option: Checkbutton = Checkbutton(options_frame, text = "Ignore Grammatical Symbols", variable=grammar_var)
+
+    capital_var: IntVar = IntVar()
+    capital_option: Checkbutton = Checkbutton(options_frame, text = "Ignore Capitalization", variable = capital_var)
+
+    options_gui_elements: list[Checkbutton] = [spaces_option, grammar_option, capital_option]
+    options_vars: list[IntVar] = [spaces_var, grammar_var, capital_var]
+    #------Position Central Frame-----
+
+    central_frame.grid(row = 1, column = 1)
+
+    #    <<<<<Central Frame>>>>>
+
+    encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
+
+    cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
+
+    options_frame.grid(row = 2, column = 0)
+
+    exit_button.grid(row=3, column = 0, pady = (30, 0))
+
+    #    <<<<<Cipher Frame>>>>>
+
+    cipher_button.grid(row = 0, column = 0)
+
+    cipher_selection.grid(row = 0, column = 1)
+
+    #    <<<<<Options Frame>>>>>
+
+    spaces_option.grid(row = 0, column = 0)
+
+    grammar_option.grid(row = 1, column = 0)
+
+    capital_option.grid(row = 2, column = 0)
+
+    #-------Populate Right Frame------
+
+    output_label: Label = Label(right_frame, text="Output", font=("Impact", 16))
+
+    output_field: Text = Text(right_frame, height=10, width=40)
+    output_field.insert(END, "Your output here.")
+
+    output_save_frame: Frame = Frame(right_frame)
+
+    copy_button: Button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = lambda: copy_output_to_clipboard(root, output_field, error_messages))
+
+    file_save_frame: Frame = Frame(output_save_frame)
+
+    file_name: Text = Text(file_save_frame, height=1, width=10)
+    file_name.insert(END, "File Name")
+
+    file_save_button: Button = Button(file_save_frame, text = "Save Output to File", command=lambda: save_output_as_file(file_name, output_field, error_messages))
+
+    file_error_label: Label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
+
+    output_to_input_button: Button = Button(output_save_frame, text = "Copy Output\nto Input", command = lambda: input_to_output_copy(input_field, output_field, error_messages))
+
+    #-------Position Right Frame------
+
+    right_frame.grid(row = 1, column = 2)
+
+    #    <<<<<Right Frame>>>>>
+    output_label.grid(row = 1, column = 0)
+
+    output_field.grid(row = 2, column = 0)
+
+    output_save_frame.grid(row = 3, column = 0)
+
+    #    <<<<<Output Save Frame>>>>>
+    copy_button.grid(row = 0, column = 0)
+
+    output_to_input_button.grid(row = 0, column = 1)
+
+    file_save_frame.grid(row = 0, column = 2)
+
+    #    <<<<<File Save Frame>>>>>
+    file_name.grid(row = 0, column = 0)
+
+    file_save_button.grid(row = 1, column = 0)
+
+    file_error_label.grid(row = 2, column = 0)
+
+    #-----------Title-----------------
+    title_label: Label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
+    title_label.grid(row = 0, column = 1)
+
+
+    #------Make Things Invisible------
+    key_field.grid_remove()
+    key_label.grid_remove()
+    info_icon.grid_remove()
+
+    error_messages: list[Label] = [key_error, file_error_label]
+    hide_errors(error_messages)
+
+    root.mainloop()
     return
 
-def save_output_as_file_helper():
-    global file_name, output_field, error_messages
-    save_output_as_file(file_name, output_field, error_messages)
-    return
-
-def input_to_output_copy_helper():
-    global input_field, output_field, error_messages
-    input_to_output_copy(input_field, output_field, error_messages)
-    return
-
-root = Tk()
-root.geometry("950x400")
-root.minsize(950, 400)
-root.maxsize(950, 400)
-
-#-------------Frames--------------
-left_frame = Frame(root)
-central_frame = Frame(root)
-right_frame = Frame(root)
-
-#-------Populate Left Frame-------
-input_field = Text(left_frame, height=10, width=40)
-input_field.insert(END, "Enter your input here.")
-
-input_label = Label(left_frame, text="Input", font=("Impact",16))
-
-key_field = Text(left_frame, height=2, width = 20)
-key_field.insert(END, "Enter your key here.")
-
-key_label_frame = Frame(left_frame)
-
-key_label = Label(key_label_frame, text="Key", font=("Impact", 13))
-
-info_img = ImageTk.PhotoImage(Image.open("icons/info_icon.png"))
-info_icon = Label(key_label_frame, image = info_img)
-key_info_display = create_tool_tip(info_icon, text = key_info[CIPHER_MODE])
-
-key_error = Label(left_frame, text="Key Is Invalid", font=("Impact",13), fg='#f00')
-
-#-------Position Left Frame-------
-
-left_frame.grid(row = 1, column = 0)
-
-#    <<<<<Left Frame>>>>>
-
-input_label.grid(row = 1, column = 0)
-
-key_label_frame.grid(row = 3, column = 0)
-
-key_error.grid(row=5, column = 0)
-
-input_field.grid(row = 2, column = 0)
-key_field.grid(row = 4, column = 0)
-
-#    <<<<<Key Info Frame>>>>>
-
-key_label.grid(row = 0, column = 0)
-
-info_icon.grid(row = 0, column = 1)
-
-#------Populate Central Frame-----
-cipher_frame = Frame(central_frame)
-
-cipher_button = Button(cipher_frame, text="Activate Cipher", command=activate_cipher_helper)
-
-exit_button = Button(central_frame, text = "Exit", command=root.quit)
-
-encrypt_decrypt_mode_label = Label(central_frame, text = "Mode: Encrypt")
-
-selected_cipher = StringVar()
-selected_cipher.set(cipher_options[0])
-cipher_selection = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(x))
-
-options_frame = Frame(central_frame)
-
-spaces_var = IntVar()
-spaces_option = Checkbutton(options_frame, text = "Ignore Spaces", variable=spaces_var, state=DISABLED)
-
-grammar_var = IntVar()
-grammar_option = Checkbutton(options_frame, text = "Ignore Grammatical Symbols", variable=grammar_var)
-
-capital_var = IntVar()
-capital_option = Checkbutton(options_frame, text = "Ignore Capitalization", variable = capital_var)
-
-#------Position Central Frame-----
-
-central_frame.grid(row = 1, column = 1)
-
-#    <<<<<Central Frame>>>>>
-
-encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
-
-cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
-
-options_frame.grid(row = 2, column = 0)
-
-exit_button.grid(row=3, column = 0, pady = (30, 0))
-
-#    <<<<<Cipher Frame>>>>>
-
-cipher_button.grid(row = 0, column = 0)
-
-cipher_selection.grid(row = 0, column = 1)
-
-#    <<<<<Options Frame>>>>>
-
-spaces_option.grid(row = 0, column = 0)
-
-grammar_option.grid(row = 1, column = 0)
-
-capital_option.grid(row = 2, column = 0)
-
-#-------Populate Right Frame------
-
-output_label = Label(right_frame, text="Output", font=("Impact", 16))
-
-output_field = Text(right_frame, height=10, width=40)
-output_field.insert(END, "Your output here.")
-
-output_save_frame = Frame(right_frame)
-
-copy_button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = copy_output_to_clipboard_helper)
-
-file_save_frame = Frame(output_save_frame)
-
-file_name = Text(file_save_frame, height=1, width=10)
-file_name.insert(END, "File Name")
-
-file_save_button = Button(file_save_frame, text = "Save Output to File", command=save_output_as_file_helper)
-
-file_error_label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
-
-output_to_input_button = Button(output_save_frame, text = "Copy Output\nto Input", command = input_to_output_copy_helper)
-
-#-------Position Right Frame------
-
-right_frame.grid(row = 1, column = 2)
-
-#    <<<<<Right Frame>>>>>
-output_label.grid(row = 1, column = 0)
-
-output_field.grid(row = 2, column = 0)
-
-output_save_frame.grid(row = 3, column = 0)
-
-#    <<<<<Output Save Frame>>>>>
-copy_button.grid(row = 0, column = 0)
-
-output_to_input_button.grid(row = 0, column = 1)
-
-file_save_frame.grid(row = 0, column = 2)
-
-#    <<<<<File Save Frame>>>>>
-file_name.grid(row = 0, column = 0)
-
-file_save_button.grid(row = 1, column = 0)
-
-file_error_label.grid(row = 2, column = 0)
-
-#-----------Title-----------------
-title_label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
-title_label.grid(row = 0, column = 1)
-
-
-#------Make Things Invisible------
-key_field.grid_remove()
-key_label.grid_remove()
-info_icon.grid_remove()
-
-error_messages = [key_error, file_error_label]
-hide_errors(error_messages)
-
-root.mainloop()
+if __name__ == "__main__":
+    main()

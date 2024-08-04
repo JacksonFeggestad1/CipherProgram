@@ -1,28 +1,68 @@
-from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID
+from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID, Text, IntVar, Checkbutton, Tk, Widget, Event
+from typing import Callable
+from io import TextIOWrapper
 
-key_info = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts."]
 
-def activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, spaces_var, grammar_var, capital_var, error_messages):
+# Tool Tip class taken from https://stackoverflow.com/questions/20399243/display-message-when-hovering-over-something-with-mouse-cursor-in-python
+class Tool_Tip(object):
+    def __init__(self, widget: Widget, text: str) -> None:
+        self.widget: Widget = widget
+        self.tipwindow: Toplevel | None = None
+        self.x:int = 0
+        self.y:int = 0
+        self.text: str = text
+        return
+    
+    def show_tip(self) -> None:
+        if self.tipwindow or not self.text:
+            return
+        x:int; y:int
+        x, y, cx, cy = self.widget.bbox("insert")
+        x = x + self.widget.winfo_rootx() + 27
+        y = y + self.widget.winfo_rooty() + 27
+        self.tipwindow = Toplevel(self.widget)
+        tw: Toplevel = self.tipwindow
+        tw.wm_overrideredirect(1)
+        tw.wm_geometry("+%d+%d" % (x,y))
+        label: Label = Label(tw, text=self.text, justify=LEFT, background="#ffffe0", relief=SOLID, borderwidth=1,font=("tahoma","8","normal"))
+        label.pack(ipadx=1)
+        return
+    
+    def hide_tip(self) -> None:
+        tw: Toplevel = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()
+        return
+    
+    def update_text(self, _text: str) -> None:
+        self.text = _text
+        return
+
+
+key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts."]
+
+def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_messages: list[Label]) -> None:
     output_field.delete('1.0','end')
     hide_errors(error_messages)
 
-    options = [spaces_var.get(), grammar_var.get(), capital_var.get()]
+    options_vars: list[int] = [var.get() for var in options_vars]
 
     if NEED_KEY:
-        key = key_field.get('1.0','end')[:-1]
+        key: str = key_field.get('1.0','end')[:-1]
 
-        if not key.isnumeric():
-            error_messages[0].grid()
+        if validate_key(CIPHER_MODE, key):
+            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options_vars))
         else:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options))
-            return
+            error_messages[0].grid()
 
     else:
-        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options))
+        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
         return
     return
 
-def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages):
+def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label, 
+                     options_gui_elements: list[Checkbutton], output_field: Text, cipher_options: list[str], error_messages: list[Label]) -> tuple[int, bool]:
     hide_errors(error_messages)
 
     output_field.delete('1.0','end')
@@ -46,25 +86,25 @@ def update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label,
         info_icon.grid_remove()
 
     if CIPHER_MODE in [0,1]:
-        spaces_option.deselect()
-        spaces_option.config(state=DISABLED)
+        options_gui_elements[0].deselect()
+        options_gui_elements[0].config(state=DISABLED)
     elif CIPHER_MODE in [2]:
-        spaces_option.config(state=ACTIVE)
+        options_gui_elements[0].config(state=ACTIVE)
 
 
     return CIPHER_MODE, NEED_KEY
 
-def copy_output_to_clipboard(root, output_field, error_messages):
+def copy_output_to_clipboard(root: Tk, output_field: Text, error_messages: list[Label]) -> None:
     hide_errors(error_messages)
     root.clipboard_clear()
     root.clipboard_append(output_field.get('1.0', 'end'))
     return
 
-def save_output_as_file(file_name, output_field, error_messages):
+def save_output_as_file(file_name: Text, output_field: Text, error_messages: list[Label]) -> None:
     hide_errors(error_messages)
 
-    file_name_str = file_name.get('1.0','end')[:-1]
-    file = open(file_name_str, "w")
+    file_name_str: str = file_name.get('1.0','end')[:-1]
+    file: TextIOWrapper = open(file_name_str, "w")
     if file.closed:
         error_messages[1].grid()
         return 
@@ -72,7 +112,7 @@ def save_output_as_file(file_name, output_field, error_messages):
     file.close()
     return
 
-def input_to_output_copy(input_field, output_field, error_messages):
+def input_to_output_copy(input_field: Text, output_field: Text, error_messages: list[Label]) -> None:
     hide_errors(error_messages)
 
     input_field.delete('1.0','end')
@@ -80,57 +120,22 @@ def input_to_output_copy(input_field, output_field, error_messages):
     output_field.delete('1.0','end')
     return
 
-def hide_errors(error_messages):
+def hide_errors(error_messages: list[Label]) -> None:
     for m in error_messages:
         m.grid_remove()
     return
 
-def validate_key(CIPHER_MODE, key):
+def validate_key(CIPHER_MODE: int, key: str) -> bool:
     if CIPHER_MODE in [0,1]:
         return True
     elif CIPHER_MODE in [2]:
-        return key.is_numeric()
+        return key.isnumeric()
 
-# Tool Tip class taken from https://stackoverflow.com/questions/20399243/display-message-when-hovering-over-something-with-mouse-cursor-in-python
-class Tool_Tip(object):
-    def __init__(self, widget, text):
-        self.widget = widget
-        self.tipwindow = None
-        self.id = None
-        self.x = self.y = 0
-        self.text = text
-        return
-    
-    def show_tip(self):
-        if self.tipwindow or not self.text:
-            return
-        
-        x, y, cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 27
-        y = y + self.widget.winfo_rooty() + 27
-        self.tipwindow = tw = Toplevel(self.widget)
-        tw.wm_overrideredirect(1)
-        tw.wm_geometry("+%d+%d" % (x,y))
-        label = Label(tw, text=self.text, justify=LEFT, background="#ffffe0", relief=SOLID, borderwidth=1,font=("tahoma","8","normal"))
-        label.pack(ipadx=1)
-        return
-    
-    def hide_tip(self):
-        tw = self.tipwindow
-        self.tipwindow = None
-        if tw:
-            tw.destroy()
-        return
-    
-    def update_text(self, _text):
-        self.text = _text
-        return
-
-def create_tool_tip(widget, text):
-    tool_tip = Tool_Tip(widget, text)
-    def enter(event):
+def create_tool_tip(widget: Widget, text: str) -> Tool_Tip:
+    tool_tip: Tool_Tip = Tool_Tip(widget, text)
+    def enter(event: Event) -> None:
         tool_tip.show_tip()
-    def leave(event):
+    def leave(event: Event) -> None:
         tool_tip.hide_tip()
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
