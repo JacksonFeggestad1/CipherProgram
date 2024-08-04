@@ -1,4 +1,5 @@
 from tkinter import *
+from PIL import Image, ImageTk
 from ciphers import *
 from gui_functions import *
 
@@ -14,8 +15,8 @@ def activate_cipher_helper():
     return 
 
 def update_helper(selection_str):
-    global CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages
-    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, spaces_option, output_field, cipher_options, error_messages)
+    global CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages
+    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, spaces_option, output_field, cipher_options, error_messages)
     return
 
 def copy_output_to_clipboard_helper():
@@ -52,9 +53,15 @@ input_label = Label(left_frame, text="Input", font=("Impact",16))
 key_field = Text(left_frame, height=2, width = 20)
 key_field.insert(END, "Enter your key here.")
 
-key_label = Label(left_frame, text="Key", font=("Impact", 13))
+key_label_frame = Frame(left_frame)
 
-key_error = Label(left_frame, text="Key Must Be Numeric", font=("Impact",13), fg='#f00')
+key_label = Label(key_label_frame, text="Key", font=("Impact", 13))
+
+info_img = ImageTk.PhotoImage(Image.open("icons/info_icon.png"))
+info_icon = Label(key_label_frame, image = info_img)
+key_info_display = create_tool_tip(info_icon, text = key_info[CIPHER_MODE])
+
+key_error = Label(left_frame, text="Key Is Invalid", font=("Impact",13), fg='#f00')
 
 #-------Position Left Frame-------
 
@@ -64,11 +71,18 @@ left_frame.grid(row = 1, column = 0)
 
 input_label.grid(row = 1, column = 0)
 
-key_label.grid(row = 3, column = 0)
+key_label_frame.grid(row = 3, column = 0)
+
 key_error.grid(row=5, column = 0)
 
 input_field.grid(row = 2, column = 0)
 key_field.grid(row = 4, column = 0)
+
+#    <<<<<Key Info Frame>>>>>
+
+key_label.grid(row = 0, column = 0)
+
+info_icon.grid(row = 0, column = 1)
 
 #------Populate Central Frame-----
 cipher_frame = Frame(central_frame)
@@ -177,14 +191,9 @@ title_label.grid(row = 0, column = 1)
 #------Make Things Invisible------
 key_field.grid_remove()
 key_label.grid_remove()
-key_error.grid_remove()
-file_error_label.grid_remove()
+info_icon.grid_remove()
 
 error_messages = [key_error, file_error_label]
-
-def hide_errors():
-    global error_messages
-    for m in error_messages:
-        m.grid_remove()
+hide_errors(error_messages)
 
 root.mainloop()
