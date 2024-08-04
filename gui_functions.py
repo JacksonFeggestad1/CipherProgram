@@ -42,19 +42,22 @@ class Tool_Tip(object):
 
 key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts."]
 
-def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_messages: list[Label]) -> None:
+def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     output_field.delete('1.0','end')
-    hide_errors(error_messages)
+    hide_errors(error_label)
 
     options_vars: list[int] = [var.get() for var in options_vars]
 
     if NEED_KEY:
         key: str = key_field.get('1.0','end')[:-1]
 
-        if validate_key(CIPHER_MODE, key):
+        error_message: int
+        is_valid: bool
+        is_valid, error_message = validate_key(CIPHER_MODE, key)
+        if is_valid:
             output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options_vars))
         else:
-            error_messages[0].grid()
+            raise_error(0, error_message, error_types, error_texts, error_label)
 
     else:
         output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
@@ -62,8 +65,8 @@ def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_
     return
 
 def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label, 
-                     options_gui_elements: list[Checkbutton], output_field: Text, cipher_options: list[str], error_messages: list[Label]) -> tuple[int, bool]:
-    hide_errors(error_messages)
+                     options_gui_elements: list[Checkbutton], output_field: Text, cipher_options: list[str], error_types: list[str], error_texts: list[str], error_label: Label) -> tuple[int, bool]:
+    hide_errors(error_label)
 
     output_field.delete('1.0','end')
     key_field.delete('1.0','end')
@@ -94,42 +97,46 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
 
     return CIPHER_MODE, NEED_KEY
 
-def copy_output_to_clipboard(root: Tk, output_field: Text, error_messages: list[Label]) -> None:
-    hide_errors(error_messages)
+def copy_output_to_clipboard(root: Tk, output_field: Text, error_label: list[Label]) -> None:
+    hide_errors(error_label)
     root.clipboard_clear()
     root.clipboard_append(output_field.get('1.0', 'end'))
     return
 
-def save_output_as_file(file_name: Text, output_field: Text, error_messages: list[Label]) -> None:
-    hide_errors(error_messages)
+def save_output_as_file(file_name: Text, output_field: Text, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
+    hide_errors(error_label)
 
     file_name_str: str = file_name.get('1.0','end')[:-1]
     file: TextIOWrapper = open(file_name_str, "w")
     if file.closed:
-        error_messages[1].grid()
+        raise_error(1,1,error_types, error_texts, error_label)
         return 
     file.write(output_field.get('1.0','end'))
     file.close()
     return
 
-def input_to_output_copy(input_field: Text, output_field: Text, error_messages: list[Label]) -> None:
-    hide_errors(error_messages)
+def input_to_output_copy(input_field: Text, output_field: Text, error_label: list[Label]) -> None:
+    hide_errors(error_label)
 
     input_field.delete('1.0','end')
     input_field.insert(END, output_field.get('1.0','end')[:-1])
     output_field.delete('1.0','end')
     return
 
-def hide_errors(error_messages: list[Label]) -> None:
-    for m in error_messages:
-        m.grid_remove()
+def hide_errors(error_label: Label) -> None:
+    error_label.grid_remove()
     return
 
-def validate_key(CIPHER_MODE: int, key: str) -> bool:
+def raise_error(error_type: int, error_message: int, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
+    error_label.config(text=f'{error_types[error_type]}\n\n{error_texts[error_message]}')
+    error_label.grid()
+    return
+
+def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
     if CIPHER_MODE in [0,1]:
-        return True
+        return True, -1
     elif CIPHER_MODE in [2]:
-        return key.isnumeric()
+        return key.isnumeric(), 0
 
 def create_tool_tip(widget: Widget, text: str) -> Tool_Tip:
     tool_tip: Tool_Tip = Tool_Tip(widget, text)

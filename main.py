@@ -12,9 +12,9 @@ cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Ciphe
 
 '''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
 def update_helper(selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,
-                  options_gui_elements: list[Checkbutton], output_field: Text, error_messages: list[Label]) -> None:
+                  options_gui_elements: list[Checkbutton], output_field: Text, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     global CIPHER_MODE, NEED_KEY, cipher_options
-    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_messages)
+    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_types, error_texts, error_label)
     return
 
 def main() -> None:
@@ -45,8 +45,6 @@ def main() -> None:
     info_icon: Label = Label(key_label_frame, image = info_img)
     key_info_display: Tool_Tip = create_tool_tip(info_icon, text = key_info[CIPHER_MODE])
 
-    key_error: Label = Label(left_frame, text="Key Is Invalid", font=("Impact",13), fg='#f00')
-
     #-------Position Left Frame-------
 
     left_frame.grid(row = 1, column = 0)
@@ -56,8 +54,6 @@ def main() -> None:
     input_label.grid(row = 1, column = 0)
 
     key_label_frame.grid(row = 3, column = 0)
-
-    key_error.grid(row=5, column = 0)
 
     input_field.grid(row = 2, column = 0)
     key_field.grid(row = 4, column = 0)
@@ -71,7 +67,7 @@ def main() -> None:
     #------Populate Central Frame-----
     cipher_frame: Frame = Frame(central_frame)
 
-    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, options_vars, error_messages))
+    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, options_vars, error_types, error_texts, error_label))
 
     exit_button: Button = Button(central_frame, text = "Exit", command=root.quit)
 
@@ -80,7 +76,7 @@ def main() -> None:
     selected_cipher: StringVar = StringVar()
     selected_cipher.set(cipher_options[0])
     cipher_selection: OptionMenu = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(x, key_field, key_label, key_info_display, info_icon, options_gui_elements,
-                                                                                                                              output_field, error_messages))
+                                                                                                                              output_field, error_types, error_texts, error_label))
 
     options_frame: Frame = Frame(central_frame)
 
@@ -95,6 +91,10 @@ def main() -> None:
 
     options_gui_elements: list[Checkbutton] = [spaces_option, grammar_option, capital_option]
     options_vars: list[IntVar] = [spaces_var, grammar_var, capital_var]
+
+    error_types: list[str] = ["Key Error", "File Error"]
+    error_texts: list[str] = ["Key must be a numeric value", "File could not be opened"]
+    error_label: Label = Label(central_frame, borderwidth = 1, background="#ffffe0", justify=CENTER, text = f'{error_types[0]}\n\n{error_texts[0]}', font=("tahoma","8"), fg="#f00000")
     #------Position Central Frame-----
 
     central_frame.grid(row = 1, column = 1)
@@ -107,7 +107,9 @@ def main() -> None:
 
     options_frame.grid(row = 2, column = 0)
 
-    exit_button.grid(row=3, column = 0, pady = (30, 0))
+    error_label.grid(row = 3, column = 0)
+
+    exit_button.grid(row = 4, column = 0, pady = (30, 0))
 
     #    <<<<<Cipher Frame>>>>>
 
@@ -132,18 +134,16 @@ def main() -> None:
 
     output_save_frame: Frame = Frame(right_frame)
 
-    copy_button: Button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = lambda: copy_output_to_clipboard(root, output_field, error_messages))
+    copy_button: Button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = lambda: copy_output_to_clipboard(root, output_field, error_label))
 
     file_save_frame: Frame = Frame(output_save_frame)
 
     file_name: Text = Text(file_save_frame, height=1, width=10)
     file_name.insert(END, "File Name")
 
-    file_save_button: Button = Button(file_save_frame, text = "Save Output to File", command=lambda: save_output_as_file(file_name, output_field, error_messages))
+    file_save_button: Button = Button(file_save_frame, text = "Save Output to File", command=lambda: save_output_as_file(file_name, output_field, error_types, error_texts, error_label))
 
-    file_error_label: Label = Label(output_save_frame, text = "Invalid File Name", fg="#f00")
-
-    output_to_input_button: Button = Button(output_save_frame, text = "Copy Output\nto Input", command = lambda: input_to_output_copy(input_field, output_field, error_messages))
+    output_to_input_button: Button = Button(output_save_frame, text = "Copy Output\nto Input", command = lambda: input_to_output_copy(input_field, output_field, error_label))
 
     #-------Position Right Frame------
 
@@ -168,8 +168,6 @@ def main() -> None:
 
     file_save_button.grid(row = 1, column = 0)
 
-    file_error_label.grid(row = 2, column = 0)
-
     #-----------Title-----------------
     title_label: Label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
     title_label.grid(row = 0, column = 1)
@@ -179,9 +177,7 @@ def main() -> None:
     key_field.grid_remove()
     key_label.grid_remove()
     info_icon.grid_remove()
-
-    error_messages: list[Label] = [key_error, file_error_label]
-    hide_errors(error_messages)
+    error_label.grid_remove()
 
     root.mainloop()
     return
