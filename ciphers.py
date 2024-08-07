@@ -134,6 +134,36 @@ def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
 
     return ""
 
+def block_permutation(input_str: str) -> str:
+    input_length: int = len(input_str)
+    result: list[str] = ['0']*len(input_str)
+    input: list[str] = list(input_str)
+
+    if input_length % 4 == 0:
+        for i in range(0, input_length, 4):
+            result[i] = input[i+1]
+            result[i+1] = input[i+3]
+            result[i+2] = input[i]
+            result[i+3] = input[i+2]
+    else:
+        for i in range(0, (input_length//4)*4, 4):
+            result[i] = input[i+1]
+            result[i+1] = input[i+3]
+            result[i+2] = input[i]
+            result[i+3] = input[i+2]
+        
+        if input_length % 4 == 1:
+            result[-1] = input[-1]
+        elif input_length % 4 == 2:
+            result[-1] = input[-2]
+            result[-2] = input[-1]
+        elif input_length % 4 == 3:
+            result[-1] = input[-3]
+            result[-2] = input[-1]
+            result[-3] = input[-2]
+
+    return ''.join(result)
+
 def ord_str(input_str: str) -> np.ndarray[int]:
     result: np.ndarray[int] = np.zeros(len(input_str), dtype=int)
     counter: int = 0
@@ -146,4 +176,7 @@ def chr_str(input_nums: np.ndarray[int]) -> str:
     result: list[str] = []
     for num in input_nums:
         result.append(chr(num+97))
-    return ''.join(result) 
+    return ''.join(result)
+
+if __name__ == "__main__":
+    print('\n'.join([block_permutation(string) for string in ["1234", "12345", "123456", "1234567", "12345678"]]))
