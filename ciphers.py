@@ -63,7 +63,8 @@ def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
         word_counter += 1
     return result
 
-def position_cipher_2(input_str: str, key: int, options:list[int]) -> str:
+def position_cipher_2(input_str: str, key_str: str, options:list[int]) -> str:
+    key: int = int(key_str)
     input_arr:list[str] = input_str.split()
     result:str = ""
     counter: int; prev_counter: int; loop_counter: int
@@ -91,7 +92,7 @@ def position_cipher_2(input_str: str, key: int, options:list[int]) -> str:
             result += " "
     return result
 
-def block_cipher_1(input_str: str, key: int, options: list[int]) -> str:
+def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
     '''Add way to re_add spaces to result at the end'''
     if options[0]==0:
         spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
@@ -99,7 +100,6 @@ def block_cipher_1(input_str: str, key: int, options: list[int]) -> str:
     plaintext: str = ''.join(input_str.split()).lower()
     plaintext = ''.join(re.split(r"[^a-z]+", plaintext))
     
-    key_str: str = f'{key}'
     blocks: list[str] = [plaintext[i: i+len(key_str)] for i in range(0,len(plaintext), len(key_str))]
     prev_block: np.ndarray|None = None
 
@@ -129,6 +129,11 @@ def block_cipher_1(input_str: str, key: int, options: list[int]) -> str:
     else:
         return ''.join(result)
 
+
+def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
+
+    return ""
+
 def ord_str(input_str: str) -> np.ndarray[int]:
     result: np.ndarray[int] = np.zeros(len(input_str), dtype=int)
     counter: int = 0
@@ -141,4 +146,4 @@ def chr_str(input_nums: np.ndarray[int]) -> str:
     result: list[str] = []
     for num in input_nums:
         result.append(chr(num+97))
-    return ''.join(result)
+    return ''.join(result) 

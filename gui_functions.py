@@ -40,7 +40,7 @@ class Tool_Tip(object):
         return
 
 
-key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer."]
+key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater."]
 
 def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     output_field.delete('1.0','end')
@@ -51,11 +51,10 @@ def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_
     if NEED_KEY:
         key: str = key_field.get('1.0','end')[:-1]
 
-        error_message: int
-        is_valid: bool
+        is_valid: bool; error_message: int 
         is_valid, error_message = validate_key(CIPHER_MODE, key)
         if is_valid:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), int(key), options_vars))
+            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), key, options_vars))
         else:
             raise_error(0, error_message, error_types, error_texts, error_label)
 
@@ -76,7 +75,7 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
 
     if CIPHER_MODE in [0,1]:
         NEED_KEY = False
-    elif CIPHER_MODE in [2,3]:
+    elif CIPHER_MODE in [2,3,4]:
         NEED_KEY = True
 
     if NEED_KEY:
@@ -97,7 +96,7 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
         options_gui_elements[0].config(state=DISABLED)
     elif CIPHER_MODE in [2]:
         options_gui_elements[0].config(state=ACTIVE)
-    elif CIPHER_MODE in [3]:
+    elif CIPHER_MODE in [3, 4]:
         options_gui_elements[1].select()
         options_gui_elements[1].config(state=DISABLED)
         options_gui_elements[2].select()
@@ -146,6 +145,12 @@ def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
         return True, -1
     elif CIPHER_MODE in [2, 3]:
         return key.isnumeric(), 0
+    elif CIPHER_MODE in [4]:
+        for char in key:
+            if (ord(char) > 122 and ord(char) < 97) and (ord(char) > 90 and ord(char) < 65):
+                return False, 2
+        return len(key) >= 4, 2
+
 
 def create_tool_tip(widget: Widget, text: str) -> Tool_Tip:
     tool_tip: Tool_Tip = Tool_Tip(widget, text)
