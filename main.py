@@ -7,8 +7,8 @@ from gui_functions import *
 CIPHER_MODE: int = 0
 NEED_KEY: bool = False
 
-ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
-cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
+ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2, block_cipher_1]
+cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher", "Cipher in Parts II"]
 
 '''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
 def update_helper(selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,

@@ -1,4 +1,7 @@
 import numpy as np
+import re
+
+# options = [spaces, grammar, capitals]
 
 def position_cipher_1(input_str: str, options: list[int]) -> str:
     input_arr: list[str] = input_str.split()
@@ -25,7 +28,7 @@ def position_cipher_1(input_str: str, options: list[int]) -> str:
         word_count += 1
     return result
 
-def cipher_by_cases_1(input_str, options) -> str:
+def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
     input_arr: list[str] = input_str.split()
     result: str = ""
     word_counter:int = 1
@@ -60,7 +63,7 @@ def cipher_by_cases_1(input_str, options) -> str:
         word_counter += 1
     return result
 
-def position_cipher_2(input_str, key, options) -> str:
+def position_cipher_2(input_str: str, key: int, options:list[int]) -> str:
     input_arr:list[str] = input_str.split()
     result:str = ""
     counter: int; prev_counter: int; loop_counter: int
@@ -87,3 +90,55 @@ def position_cipher_2(input_str, key, options) -> str:
         if options[0] == 0:
             result += " "
     return result
+
+def block_cipher_1(input_str: str, key: int, options: list[int]) -> str:
+    '''Add way to re_add spaces to result at the end'''
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    '''Strip out all non_alphabetic characters'''
+    plaintext: str = ''.join(input_str.split()).lower()
+    plaintext = ''.join(re.split(r"[^a-z]+", plaintext))
+    
+    key_str: str = f'{key}'
+    blocks: list[str] = [plaintext[i: i+len(key_str)] for i in range(0,len(plaintext), len(key_str))]
+    prev_block: np.ndarray|None = None
+
+    num_blocks: np.ndarray[int] = np.asarray(list(ord_str(plaintext)) + [0]*(len(key_str) - len(blocks[-1]))).reshape((-1,len(key_str)))
+
+    result: list[str] = []
+    key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key_str])
+
+    for arr in zip(num_blocks, blocks):
+        if prev_block is None:
+            if len(arr[1]) < len(key_str):
+                result.append(chr_str((arr[0][:len(arr[1])] + key_str_num[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((arr[0] + key_str_num) % 26))
+        else:
+            if len(arr[1]) < len(key_str):
+                result.append(chr_str((arr[0][:len(arr[1])] + key_str_num[:len(arr[1])] + prev_block[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((arr[0] + key_str_num + prev_block) % 26))
+        prev_block = arr[0]
+    
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)
+
+def ord_str(input_str: str) -> np.ndarray[int]:
+    result: np.ndarray[int] = np.zeros(len(input_str), dtype=int)
+    counter: int = 0
+    for char in input_str:
+        result[counter] = ord(char)-97
+        counter += 1
+    return result
+
+def chr_str(input_nums: np.ndarray[int]) -> str:
+    result: list[str] = []
+    for num in input_nums:
+        result.append(chr(num+97))
+    return ''.join(result)
