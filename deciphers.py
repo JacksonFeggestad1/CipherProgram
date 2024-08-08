@@ -89,17 +89,100 @@ def position_decipher_2(input_str: str, key_str:str, options: list[int]) -> str:
             if counter == 0 and prev_counter != 0:
                 loop_counter += 1
         if options[0] == 0:
-            result.append(" ")
+           result.append(" ")
     return ''.join(result)
 
 def block_decipher_1(input_str: str, key:str, options: list[int]) -> str:
-
-    return
+    '''Add way to re_add spaces to result at the end'''
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    
+    prev_block: np.ndarray[int]|None = None
+    for arr in zip(num_blocks, blocks):
+        if prev_block is None:
+            if len(arr[1]) < len(key):
+                result.append(chr_str((arr[0][:len(arr[1])] - key_str_num[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((arr[0] - key_str_num) % 26))
+        else:
+            if len(arr[1]) < len(key):
+                result.append(chr_str((arr[0][:len(arr[1])] - key_str_num[:len(arr[1])] - prev_block[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((arr[0] - key_str_num - prev_block) % 26))
+        prev_block = arr[0]
+    
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)
 
 def block_decipher_2(input_str: str, key:str, options: list[int]) -> str:
+    '''Add way to re_add spaces to result at the end'''
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
 
-    return
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
+
+    for arr in zip(num_blocks, blocks):
+        if prev_block is None:
+            if len(arr[1]) < len(key):
+                prev_block = block_permutation_inverse((arr[0][:len(arr[1])] - key_str_num[:len(arr[1])]) % 26)
+                result.append(chr_str(prev_block))
+            else:
+                prev_block = block_permutation_inverse((arr[0] - key_str_num) % 26)
+                result.append(chr_str(prev_block))
+        else:
+            if len(arr[1]) < len(key):
+                prev_block = block_permutation_inverse((arr[0][:len(arr[1])] - key_str_num[:len(arr[1])] - prev_block[:len(arr[1])]) % 26)
+                result.append(chr_str(prev_block))
+            else:
+                prev_block = block_permutation_inverse((arr[0] - key_str_num - prev_block) % 26)
+                result.append(chr_str(prev_block))
+
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)
 
 def block_decipher_3(input_str: str, key:str, options: list[int]) -> str:
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
 
-    return
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
+
+    for arr in zip(num_blocks, blocks):
+        if prev_block is None:
+            if len(arr[1]) < len(key):
+                result.append(chr_str(block_permutation_inverse((arr[0][:len(arr[1])] - key_str_num[:len(arr[1])]) % 26)))
+            else:
+                result.append(chr_str(block_permutation_inverse((arr[0] - key_str_num) % 26)))
+        else:
+            if len(arr[1]) < len(key):
+                result.append(chr_str(block_permutation_inverse((arr[0][:len(arr[1])] - prev_block[:len(arr[1])]) % 26)))
+            else:
+                result.append(chr_str(block_permutation_inverse((arr[0] - prev_block) % 26)))
+        prev_block = arr[0]
+
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)

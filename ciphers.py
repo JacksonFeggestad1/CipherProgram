@@ -179,10 +179,10 @@ def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
                 result.append(chr_str(prev_block))
         else:
             if len(arr[1]) < len(key):
-                prev_block = (block_permutation(arr[0][:len(arr[1])]) + key_str_num[:len(arr[1])] + prev_block[:len(arr[1])]) % 26
+                prev_block = (block_permutation(arr[0][:len(arr[1])]) + prev_block[:len(arr[1])]) % 26
                 result.append(chr_str(prev_block))
             else:
-                prev_block = (block_permutation(arr[0]) + key_str_num + prev_block) % 26
+                prev_block = (block_permutation(arr[0]) + prev_block) % 26
                 result.append(chr_str(prev_block))
 
     if options[0] == 0:
