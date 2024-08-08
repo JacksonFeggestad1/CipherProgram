@@ -7,7 +7,7 @@ from cipher_helpers import *
 
 def position_cipher_1(input_str: str, options: list[int]) -> str:
     input_arr: list[str] = input_str.split()
-    result: str = ""
+    result: list[str] = []
     word_count: int = 1
     word: str
     for word in input_arr:
@@ -18,21 +18,21 @@ def position_cipher_1(input_str: str, options: list[int]) -> str:
         for letter in word:
             num: int = ord(letter)
             if (num >= 97 and num <= 122):
-                result += f'{chr((num - 97 + word_count + letter_count)%26 + 97)}'
+                result.append(f'{chr((num - 97 + word_count + letter_count)%26 + 97)}')
             elif(num >= 65 and num <= 90):
-                result += f'{chr((num - 65 + word_count + letter_count)%26 + 65)}'
+                result.append(f'{chr((num - 65 + word_count + letter_count)%26 + 65)}')
             else:
                 letter_count -= 1
                 if options[1] == 0:
-                    result += letter
+                    result.append(letter)
             letter_count += 1
-        result += " "
+        result.append(' ')
         word_count += 1
-    return result
+    return ''.join(result)
 
 def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
     input_arr: list[str] = input_str.split()
-    result: str = ""
+    result: list[str] = []
     word_counter:int = 1
     word: str
     for word in input_arr:
@@ -44,31 +44,31 @@ def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
             num: int = ord(letter)
             if num % 2 == 1:
                 if (num >= 97 and num <= 122):
-                    result += f'{chr((num-letter_counter-word_counter-97)%26 + 97)}'
+                    result.append(f'{chr((num-letter_counter-word_counter-97)%26 + 97)}')
                 elif (num >= 65 and num <= 90):
-                    result += f'{chr((num-letter_counter-word_counter-65)%26 + 65)}'
+                    result.append(f'{chr((num-letter_counter-word_counter-65)%26 + 65)}')
                 else:
                     letter_counter -= 1
                     if options[1] == 0:
-                        result += letter
+                        result.append(letter)
             elif num % 2 == 0:
                 if (num >= 97 and num <= 122):
-                    result += f'{chr((num+letter_counter+word_counter-97)%26 + 97)}'
+                    result.append(f'{chr((num+letter_counter+word_counter-97)%26 + 97)}')
                 elif (num >= 65 and num <= 90):
-                    result += f'{chr((num+letter_counter+word_counter-65)%26 + 65)}'
+                    result.append(f'{chr((num+letter_counter+word_counter-65)%26 + 65)}')
                 else:
                     letter_counter -= 1
                     if options[1] == 0:
-                        result += letter
+                        result.append(letter)
             letter_counter += 1
-        result += " "
+        result.append(" ")
         word_counter += 1
-    return result
+    return ''.join(result)
 
 def position_cipher_2(input_str: str, key_str: str, options:list[int]) -> str:
     key: int = int(key_str)
     input_arr:list[str] = input_str.split()
-    result:str = ""
+    result: list[str] = []
     counter: int; prev_counter: int; loop_counter: int
     counter, prev_counter, loop_counter = 1, 1, 1
     word: str
@@ -80,19 +80,19 @@ def position_cipher_2(input_str: str, key_str: str, options:list[int]) -> str:
             num: int = ord(letter)
             prev_counter: int = counter
             if (num >= 97 and num <= 122):
-                result += f'{chr((num-97+counter+loop_counter)%26+97)}'
+                result.append(f'{chr((num-97+counter+loop_counter)%26+97)}')
             elif (num >= 65 and num <= 90):
-                result += f'{chr((num-65+counter+loop_counter)%26+65)}'
+                result.append(f'{chr((num-65+counter+loop_counter)%26+65)}')
             else:
                 if options[1] == 0:
-                    result += letter
+                    result.append(letter)
                 counter -= 1
             counter = (counter + 1) % key
             if counter == 0 and prev_counter != 0:
                 loop_counter += 1
         if options[0] == 0:
-            result += " "
-    return result
+            result.append(" ")
+    return ''.join(result)
 
 def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
     '''Add way to re_add spaces to result at the end'''
@@ -192,5 +192,3 @@ def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
         return ''.join(temp)
     else:
         return ''.join(result)
-
-# ------------- Helper Functions --------------
