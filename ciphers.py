@@ -42,7 +42,7 @@ def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
         letter: str
         for letter in word:
             num: int = ord(letter)
-            if num % 2 == 1:
+            if word_counter % 2 == 1:
                 if (num >= 97 and num <= 122):
                     result.append(f'{chr((num-letter_counter-word_counter-97)%26 + 97)}')
                 elif (num >= 65 and num <= 90):
@@ -51,7 +51,7 @@ def cipher_by_cases_1(input_str: str, options: list[int]) -> str:
                     letter_counter -= 1
                     if options[1] == 0:
                         result.append(letter)
-            elif num % 2 == 0:
+            elif word_counter % 2 == 0:
                 if (num >= 97 and num <= 122):
                     result.append(f'{chr((num+letter_counter+word_counter-97)%26 + 97)}')
                 elif (num >= 65 and num <= 90):
