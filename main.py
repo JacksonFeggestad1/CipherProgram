@@ -7,8 +7,8 @@ from gui_functions import *
 CIPHER_MODE: int = 0
 NEED_KEY: bool = False
 
-ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2]
-cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher"]
+ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2, block_cipher_1, block_cipher_2, block_cipher_3]
+cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher", "Snowball Cipher", "Shuffle Cipher", "Shuffle Cipher II"]
 
 '''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
 def update_helper(selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,
@@ -19,9 +19,9 @@ def update_helper(selection_str: str, key_field: Text, key_label: Label, key_inf
 
 def main() -> None:
     root: Tk = Tk()
-    root.geometry("950x400")
-    root.minsize(950, 400)
-    root.maxsize(950, 400)
+    root.geometry("950x430")
+    root.minsize(950, 430)
+    root.maxsize(950, 430)
 
     #-------------Frames--------------
     left_frame: Frame = Frame(root)
@@ -93,7 +93,9 @@ def main() -> None:
     options_vars: list[IntVar] = [spaces_var, grammar_var, capital_var]
 
     error_types: list[str] = ["Key Error", "File Error"]
-    error_texts: list[str] = ["Key must be a numeric value", "File could not be opened"]
+    #---- Error Messages Here:
+    error_texts: list[str] = ["Key must be a numeric value", "File could not be opened", "Key must be a word of\nlength four or greater."]
+
     error_label: Label = Label(central_frame, borderwidth = 1, background="#ffffe0", justify=CENTER, text = f'{error_types[0]}\n\n{error_texts[0]}', font=("tahoma","8"), fg="#f00000")
     #------Position Central Frame-----
 
