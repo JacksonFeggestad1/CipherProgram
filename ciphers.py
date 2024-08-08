@@ -96,8 +96,8 @@ def position_cipher_2(input_str: str, key_str: str, options:list[int]) -> str:
 
 def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
     '''Add way to re_add spaces to result at the end'''
-    if options[0]==0:
-        spaces_tracker: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
     
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key_str)
@@ -120,41 +120,13 @@ def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
                 prev_block = (arr[0] + key_str_num + prev_block) % 26
                 result.append(chr_str(prev_block))
     
-    if options[0] == 0:
-        temp: list[str] = list(''.join(result))
-        for loc in spaces_tracker:
-            temp.insert(loc, ' ')
-        return ''.join(temp)
-    else:
-        return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
 
 
 def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
     '''Add way to re_add spaces to result at the end'''
-    spaces_tracker: list[int] = []
-    grammar_tracker: list[tuple[str, int]] = []
-    capitals_tracker: list[int] = []
-    if options[0] == 0:
-        spaces_tracker = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
-    
-    spaces_counter: int = len(spaces_tracker)
-
-    if options[1] == 0:
-        grammar_tracker: list[tuple[str, int]] = []
-        for arr in zip(input_str,range(len(input_str))):
-            num: int = ord(arr[0])
-            if not ((num >= 65 and num <= 90) or (num >= 97 and num <= 122) or (num <= 32) or (num == 127)):
-                if options[0] == 1:
-                    grammar_tracker.append((arr[0], arr[1] - np.sum(np.asarray(list(input_str))[:arr[1]] == ' ')))
-                else:
-                    grammar_tracker.append((arr[0], arr[1]))
-        
-    grammar_counter: int = len(grammar_tracker)
-
-    if options[2] == 0:
-        for i in range(len(input_str)):
-            if ord(input_str[i]) >= 65 and ord(input_str[i]) <= 90:
-                capitals_tracker.append(i - spaces_counter - grammar_counter)
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
 
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
@@ -174,20 +146,11 @@ def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
                 result.append(chr_str((block_permutation(arr[0]) + key_str_num + prev_block) % 26))
         prev_block = arr[0]
 
-    result = list(''.join(result))
-    if options[0] == 0:
-        for loc in spaces_tracker:
-            result.insert(loc, ' ')
-    
-    if options[1] == 0:
-        for tup in grammar_tracker:
-            result.insert(tup[1], tup[0])
-
-    return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
     
 def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
-    if options[0]==0:
-        spaces_tracker: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
 
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
@@ -210,10 +173,4 @@ def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
                 prev_block = (block_permutation(arr[0]) + prev_block) % 26
                 result.append(chr_str(prev_block))
 
-    if options[0] == 0:
-        temp: list[str] = list(''.join(result))
-        for loc in spaces_tracker:
-            temp.insert(loc, ' ')
-        return ''.join(temp)
-    else:
-        return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))

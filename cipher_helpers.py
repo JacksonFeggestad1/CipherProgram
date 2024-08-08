@@ -90,3 +90,58 @@ def chr_str(input_nums: np.ndarray[int]) -> str:
     for num in input_nums:
         result.append(chr(num+97))
     return ''.join(result)
+
+def is_grammatical(char: str) -> bool:
+    return not ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or (ord(char) <= 32) or (ord(char) == 127)) 
+
+def get_trackers(input_str: str, options: list[int]) -> tuple[list[int]|None, list[tuple[str, int]]|None, list[int]|None]:
+    spaces_tracker: list[int]|None = None
+    grammar_tracker: list[tuple[str, int]]|None = None
+    capitals_tracker: list[int]|None = None
+
+    if options[0] == 0:
+        spaces_tracker = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    if options[1] == 0:
+        grammar_tracker = []
+        for arr in zip(input_str, range(len(input_str))):
+            if is_grammatical(arr[0]):
+                grammar_tracker.append((arr[0], arr[1]))
+    if options[2] == 0:
+        capitals_tracker = []
+        for i in range(len(input_str)):
+            if ord(input_str[i]) >= 65 and ord(input_str[i]) <= 90:
+                capitals_tracker.append(i)
+
+    return spaces_tracker, grammar_tracker, capitals_tracker
+
+def add_trackers(spaces_tracker: list[int]|None, grammar_tracker: list[tuple[str, int]]|None, capitals_tracker: list[int]|None, input_str: str, result: list[str]) -> str:
+    if grammar_tracker is not None:
+        for arr in grammar_tracker:
+            result.insert(arr[1] - np.sum([char == ' ' for char in input_str[:arr[1]]]), arr[0])
+    
+    if spaces_tracker is not None:
+        if grammar_tracker is None:
+            for loc in spaces_tracker:
+                result.insert(loc - np.sum([is_grammatical(char) for char in input_str[:loc]]), ' ')
+        else:
+            for loc in spaces_tracker:
+                result.insert(loc, ' ')
+
+    if capitals_tracker is not None:
+        if grammar_tracker is None and spaces_tracker is None:
+            for loc in capitals_tracker:
+                index: int = loc - np.sum([is_grammatical(char) for char in input_str[:loc]],dtype=int) - np.sum([char == ' ' for char in input_str[:loc]],dtype=int)
+                result[index] = result[index].upper() 
+        elif grammar_tracker is None:
+            for loc in capitals_tracker:
+                index: int = loc - np.sum([is_grammatical(char) for char in input_str[:loc]],dtype=int)
+                result[index] = result[index].upper() 
+        elif spaces_tracker is None:
+            for loc in capitals_tracker:
+                index: int = loc - np.sum([char == ' ' for char in input_str[:loc]],dtype=int)
+                result[index] = result[index].upper() 
+        else:
+            for loc in capitals_tracker:
+                result[loc] = result[loc].upper() 
+    
+    return ''.join(result)

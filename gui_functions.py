@@ -102,11 +102,6 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
         options_gui_elements[0].config(state=DISABLED)
     elif CIPHER_MODE in [2]:
         options_gui_elements[0].config(state=ACTIVE)
-    elif CIPHER_MODE in [3, 5]:
-        options_gui_elements[1].select()
-        options_gui_elements[1].config(state=DISABLED)
-        options_gui_elements[2].select()
-        options_gui_elements[2].config(state=DISABLED)
 
 
     return CIPHER_MODE, NEED_KEY
