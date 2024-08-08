@@ -1,4 +1,4 @@
-from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID, Text, IntVar, Checkbutton, Tk, Widget, Event
+from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID, Text, IntVar, Checkbutton, Tk, Widget, Event, Button
 from typing import Callable
 from io import TextIOWrapper
 
@@ -43,7 +43,8 @@ class Tool_Tip(object):
 key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater.",
                         "Key should be a word\nof length four or greater."]
 
-def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
+def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], deciphers: list[Callable],
+                    options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     output_field.delete('1.0','end')
     hide_errors(error_label)
 
@@ -55,13 +56,17 @@ def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_
         is_valid: bool; error_message: int 
         is_valid, error_message = validate_key(CIPHER_MODE, key)
         if is_valid:
-            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), key, options_vars))
+            if CIPHER_DECIPHER:
+                output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'), key, options_vars))
+            else:
+                output_field.insert(END, deciphers[CIPHER_MODE](input_field.get('1.0','end'), key, options_vars))
         else:
             raise_error(0, error_message, error_types, error_texts, error_label)
-
     else:
-        output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
-        return
+        if CIPHER_DECIPHER:
+            output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
+        else:
+            output_field.insert(END, deciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
     return
 
 def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label, 
@@ -162,3 +167,12 @@ def create_tool_tip(widget: Widget, text: str) -> Tool_Tip:
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
     return tool_tip
+
+def toggle_cipher_decipher(toggle_button: Button, toggle_label: Label, CIPHER_DECIPHER: bool) -> bool:
+    if CIPHER_DECIPHER:
+        toggle_button.config(text = "Activate Cipher Mode")
+        toggle_label.config(text = "Mode: Decipher")
+    else:
+        toggle_button.config(text = "Activate Decipher Mode")
+        toggle_label.config(text = "Mode: Cipher")
+    return not CIPHER_DECIPHER

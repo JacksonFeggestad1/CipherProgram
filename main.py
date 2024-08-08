@@ -2,12 +2,15 @@ from tkinter import *
 from typing import Callable
 from PIL import Image, ImageTk
 from ciphers import *
+from deciphers import *
 from gui_functions import *
 
 CIPHER_MODE: int = 0
 NEED_KEY: bool = False
+CIPHER_DECIPHER: bool = True    # True = Cipher; False = Decipher
 
 ciphers: list[Callable] = [position_cipher_1, cipher_by_cases_1, position_cipher_2, block_cipher_1, block_cipher_2, block_cipher_3]
+deciphers: list[Callable] = [position_decipher_1, decipher_by_cases_1, position_decipher_2, block_decipher_1, block_decipher_2, block_decipher_3]
 cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher", "Snowball Cipher", "Shuffle Cipher", "Shuffle Cipher II"]
 
 '''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
@@ -17,11 +20,17 @@ def update_helper(selection_str: str, key_field: Text, key_label: Label, key_inf
     CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_types, error_texts, error_label)
     return
 
+def toggle_cipher_helper(toggle_button: Button, toggle_label: Label) -> None:
+    global CIPHER_DECIPHER
+    CIPHER_DECIPHER = toggle_cipher_decipher(toggle_button, toggle_label, CIPHER_DECIPHER)
+
 def main() -> None:
     root: Tk = Tk()
-    root.geometry("950x430")
-    root.minsize(950, 430)
-    root.maxsize(950, 430)
+    x:int; y:int
+    x, y = 1000, 450
+    root.geometry(f"{x}x{y}")
+    root.minsize(x, y)
+    root.maxsize(x, y)
 
     #-------------Frames--------------
     left_frame: Frame = Frame(root)
@@ -67,11 +76,15 @@ def main() -> None:
     #------Populate Central Frame-----
     cipher_frame: Frame = Frame(central_frame)
 
-    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, output_field, input_field, key_field, ciphers, options_vars, error_types, error_texts, error_label))
+    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, CIPHER_DECIPHER, output_field, input_field, key_field, ciphers, deciphers, options_vars, error_types, error_texts, error_label))
 
     exit_button: Button = Button(central_frame, text = "Exit", command=root.quit)
 
-    encrypt_decrypt_mode_label: Label = Label(central_frame, text = "Mode: Encrypt")
+    encrypt_decrypt_frame: Label = Label(central_frame)
+
+    encrypt_decrypt_mode_label: Label = Label(encrypt_decrypt_frame, text = "Mode: Encrypt")
+
+    encrypt_decrypt_toggle_button: Button = Button(encrypt_decrypt_frame, text = "Activate Decipher Mode", command = lambda: toggle_cipher_helper(encrypt_decrypt_toggle_button, encrypt_decrypt_mode_label))
 
     selected_cipher: StringVar = StringVar()
     selected_cipher.set(cipher_options[0])
@@ -103,9 +116,9 @@ def main() -> None:
 
     #    <<<<<Central Frame>>>>>
 
-    encrypt_decrypt_mode_label.grid(row = 0,column = 0, padx = (100,100))
+    encrypt_decrypt_frame.grid(row = 0,column = 0, padx = (100,100))
 
-    cipher_frame.grid(row=1, column = 0, padx = (30, 30), pady = (50, 20))
+    cipher_frame.grid(row=1, column = 0, padx = (20, 20), pady = (50, 20))
 
     options_frame.grid(row = 2, column = 0)
 
@@ -126,6 +139,12 @@ def main() -> None:
     grammar_option.grid(row = 1, column = 0)
 
     capital_option.grid(row = 2, column = 0)
+
+    #    <<<<<Cipher Toggle Frame>>>>>
+
+    encrypt_decrypt_mode_label.grid(row = 0, column = 0)
+
+    encrypt_decrypt_toggle_button.grid(row = 1, column = 0)
 
     #-------Populate Right Frame------
 
