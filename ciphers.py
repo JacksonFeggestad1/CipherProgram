@@ -96,18 +96,21 @@ def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
     '''Add way to re_add spaces to result at the end'''
     if options[0]==0:
         spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
-    '''Strip out all non_alphabetic characters'''
+    
+    '''
     plaintext: str = ''.join(input_str.split()).lower()
     plaintext = ''.join(re.split(r"[^a-z]+", plaintext))
-    
+    '''
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key_str)
+    '''
     blocks: list[str] = [plaintext[i: i+len(key_str)] for i in range(0,len(plaintext), len(key_str))]
-    prev_block: np.ndarray|None = None
-
     num_blocks: np.ndarray[int] = np.asarray(list(ord_str(plaintext)) + [0]*(len(key_str) - len(blocks[-1]))).reshape((-1,len(key_str)))
-
-    result: list[str] = []
     key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key_str])
-
+    '''
+    result: list[str] = []
+    
+    prev_block: np.ndarray|None = None
     for arr in zip(num_blocks, blocks):
         if prev_block is None:
             if len(arr[1]) < len(key_str):
@@ -131,8 +134,30 @@ def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
 
 
 def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
+    '''Add way to re_add spaces to result at the end'''
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
 
-    return ""
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+
+    result: list[str] = []
+
+    return ''.join(result)
+
+def blockify(input_str: str, key: str) -> tuple[list[str], np.ndarray[int], np.ndarray[int]]:
+    '''Strip out all non_alphabetic characters'''
+    plaintext: str = ''.join(input_str.split()).lower()
+    plaintext = ''.join(re.split(r"[^a-z]+", plaintext))
+    
+    blocks: list[str] = [plaintext[i: i+len(key)] for i in range(0,len(plaintext), len(key))]
+
+    num_blocks: np.ndarray[int] = np.asarray(list(ord_str(plaintext)) + [0]*(len(key) - len(blocks[-1]))).reshape((-1,len(key)))
+
+    key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key])
+
+    return blocks, num_blocks, key_str_num
+
 
 def block_permutation(input_str: str) -> str:
     input_length: int = len(input_str)
@@ -177,6 +202,3 @@ def chr_str(input_nums: np.ndarray[int]) -> str:
     for num in input_nums:
         result.append(chr(num+97))
     return ''.join(result)
-
-if __name__ == "__main__":
-    print('\n'.join([block_permutation(string) for string in ["1234", "12345", "123456", "1234567", "12345678"]]))
