@@ -3,6 +3,8 @@ import re
 
 # options = [spaces, grammar, capitals]
 
+# ------------- Ciphers --------------
+
 def position_cipher_1(input_str: str, options: list[int]) -> str:
     input_arr: list[str] = input_str.split()
     result: str = ""
@@ -97,32 +99,26 @@ def block_cipher_1(input_str: str, key_str: str, options: list[int]) -> str:
     if options[0]==0:
         spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
     
-    '''
-    plaintext: str = ''.join(input_str.split()).lower()
-    plaintext = ''.join(re.split(r"[^a-z]+", plaintext))
-    '''
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key_str)
-    '''
-    blocks: list[str] = [plaintext[i: i+len(key_str)] for i in range(0,len(plaintext), len(key_str))]
-    num_blocks: np.ndarray[int] = np.asarray(list(ord_str(plaintext)) + [0]*(len(key_str) - len(blocks[-1]))).reshape((-1,len(key_str)))
-    key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key_str])
-    '''
     result: list[str] = []
     
-    prev_block: np.ndarray|None = None
+    prev_block: np.ndarray[int]|None = None
     for arr in zip(num_blocks, blocks):
         if prev_block is None:
             if len(arr[1]) < len(key_str):
-                result.append(chr_str((arr[0][:len(arr[1])] + key_str_num[:len(arr[1])]) % 26))
+                prev_block = (arr[0][:len(arr[1])] + key_str_num[:len(arr[1])]) % 26
+                result.append(chr_str(prev_block))
             else:
-                result.append(chr_str((arr[0] + key_str_num) % 26))
+                prev_block = (arr[0] + key_str_num) % 26
+                result.append(chr_str(prev_block))
         else:
             if len(arr[1]) < len(key_str):
-                result.append(chr_str((arr[0][:len(arr[1])] + key_str_num[:len(arr[1])] + prev_block[:len(arr[1])]) % 26))
+                prev_block = (arr[0][:len(arr[1])] + key_str_num[:len(arr[1])] + prev_block[:len(arr[1])]) % 26
+                result.append(chr_str(prev_block))
             else:
-                result.append(chr_str((arr[0] + key_str_num + prev_block) % 26))
-        prev_block = arr[0]
+                prev_block = (arr[0] + key_str_num + prev_block) % 26
+                result.append(chr_str(prev_block))
     
     if options[0] == 0:
         temp: list[str] = list(''.join(result))
@@ -140,10 +136,31 @@ def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
 
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
-
     result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
 
-    return ''.join(result)
+    for arr in zip(num_blocks, blocks):
+        if prev_block is None:
+            if len(arr[1]) < len(key):
+                result.append(chr_str((block_permutation(arr[0][:len(arr[1])]) + key_str_num[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((block_permutation(arr[0]) + key_str_num) % 26))
+        else:
+            if len(arr[1]) < len(key):
+                result.append(chr_str((block_permutation(arr[0][:len(arr[1])]) + key_str_num[:len(arr[1])] + prev_block[:len(arr[1])]) % 26))
+            else:
+                result.append(chr_str((block_permutation(arr[0]) + key_str_num + prev_block) % 26))
+        prev_block = arr[0]
+
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)
+
+# ------------- Helper Functions --------------
 
 def blockify(input_str: str, key: str) -> tuple[list[str], np.ndarray[int], np.ndarray[int]]:
     '''Strip out all non_alphabetic characters'''
@@ -153,16 +170,18 @@ def blockify(input_str: str, key: str) -> tuple[list[str], np.ndarray[int], np.n
     blocks: list[str] = [plaintext[i: i+len(key)] for i in range(0,len(plaintext), len(key))]
 
     num_blocks: np.ndarray[int] = np.asarray(list(ord_str(plaintext)) + [0]*(len(key) - len(blocks[-1]))).reshape((-1,len(key)))
-
-    key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key])
+    if key.isnumeric():
+        key_str_num: np.ndarray[int] = np.asarray([int(c) for c in key])
+    else:
+        key_str_num: np.ndarray[int] = np.asarray([ord(c)-97 for c in key])
 
     return blocks, num_blocks, key_str_num
 
 
-def block_permutation(input_str: str) -> str:
+def block_permutation(input_str: np.ndarray[int]) -> np.ndarray:
     input_length: int = len(input_str)
-    result: list[str] = ['0']*len(input_str)
-    input: list[str] = list(input_str)
+    result: np.ndarray[int] = np.zeros((input_length),dtype=int)
+    input: list[int] = list(input_str)
 
     if input_length % 4 == 0:
         for i in range(0, input_length, 4):
@@ -187,7 +206,7 @@ def block_permutation(input_str: str) -> str:
             result[-2] = input[-1]
             result[-3] = input[-2]
 
-    return ''.join(result)
+    return result
 
 def ord_str(input_str: str) -> np.ndarray[int]:
     result: np.ndarray[int] = np.zeros(len(input_str), dtype=int)
