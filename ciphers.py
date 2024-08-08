@@ -159,6 +159,25 @@ def block_cipher_2(input_str: str, key: str, options:list[int]) -> str:
         return ''.join(temp)
     else:
         return ''.join(result)
+    
+def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
+    if options[0]==0:
+        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
+
+    
+
+    if options[0] == 0:
+        temp: list[str] = list(''.join(result))
+        for loc in spaces_locations:
+            temp.insert(loc, ' ')
+        return ''.join(temp)
+    else:
+        return ''.join(result)
 
 # ------------- Helper Functions --------------
 

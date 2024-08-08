@@ -40,7 +40,8 @@ class Tool_Tip(object):
         return
 
 
-key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater."]
+key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater.",
+                        "Key should be a word\nof length four or greater."]
 
 def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     output_field.delete('1.0','end')
@@ -75,7 +76,7 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
 
     if CIPHER_MODE in [0,1]:
         NEED_KEY = False
-    elif CIPHER_MODE in [2,3,4]:
+    elif CIPHER_MODE in [2,3,4,5]:
         NEED_KEY = True
 
     if NEED_KEY:
@@ -96,7 +97,7 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
         options_gui_elements[0].config(state=DISABLED)
     elif CIPHER_MODE in [2]:
         options_gui_elements[0].config(state=ACTIVE)
-    elif CIPHER_MODE in [3, 4]:
+    elif CIPHER_MODE in [3, 4, 5]:
         options_gui_elements[1].select()
         options_gui_elements[1].config(state=DISABLED)
         options_gui_elements[2].select()
@@ -143,9 +144,9 @@ def raise_error(error_type: int, error_message: int, error_types: list[str], err
 def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
     if CIPHER_MODE in [0,1]:
         return True, -1
-    elif CIPHER_MODE in [2, 3]:
+    elif CIPHER_MODE in [2,3]:
         return key.isnumeric(), 0
-    elif CIPHER_MODE in [4]:
+    elif CIPHER_MODE in [4,5]:
         for char in key:
             if (ord(char) > 122 and ord(char) < 97) and (ord(char) > 90 and ord(char) < 65):
                 return False, 2
