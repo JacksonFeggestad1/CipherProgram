@@ -190,6 +190,7 @@ def block_decipher_4(input_str: str, key:str, options: list[int]) -> str:
         else:
             for i in range(4):
                 temp = ((sigma_1_inverse(block_permutation_inverse(temp))%26) - key_schedule[key_length*(counter+1):key_length*(counter+2)]) % 26
+        
         counter += 1 
         result.append(chr_str(temp))
 

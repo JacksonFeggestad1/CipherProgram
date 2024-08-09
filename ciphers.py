@@ -198,6 +198,7 @@ def block_cipher_4(input_str: str, key: str, options: list[int]) -> str:
         else:
             for i in range(4):
                 temp = block_permutation(sigma_1((temp + key_schedule[key_length*(counter+1):key_length*(counter+2)]) % 26) % 26)
+        
         counter += 1 
         result.append(chr_str(temp))
 
