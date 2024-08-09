@@ -93,10 +93,9 @@ def position_decipher_2(input_str: str, key_str:str, options: list[int]) -> str:
     return ''.join(result)
 
 def block_decipher_1(input_str: str, key:str, options: list[int]) -> str:
-    '''Add way to re_add spaces to result at the end'''
-    if options[0]==0:
-        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
-    
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
+   
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
     result: list[str] = []
@@ -115,18 +114,11 @@ def block_decipher_1(input_str: str, key:str, options: list[int]) -> str:
                 result.append(chr_str((arr[0] - key_str_num - prev_block) % 26))
         prev_block = arr[0]
     
-    if options[0] == 0:
-        temp: list[str] = list(''.join(result))
-        for loc in spaces_locations:
-            temp.insert(loc, ' ')
-        return ''.join(temp)
-    else:
-        return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
 
 def block_decipher_2(input_str: str, key:str, options: list[int]) -> str:
-    '''Add way to re_add spaces to result at the end'''
-    if options[0]==0:
-        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
 
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
@@ -149,17 +141,11 @@ def block_decipher_2(input_str: str, key:str, options: list[int]) -> str:
                 prev_block = block_permutation_inverse((arr[0] - key_str_num - prev_block) % 26)
                 result.append(chr_str(prev_block))
 
-    if options[0] == 0:
-        temp: list[str] = list(''.join(result))
-        for loc in spaces_locations:
-            temp.insert(loc, ' ')
-        return ''.join(temp)
-    else:
-        return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
 
 def block_decipher_3(input_str: str, key:str, options: list[int]) -> str:
-    if options[0]==0:
-        spaces_locations: list[int] = [int(num) for num in np.cumsum([len(word) for word in input_str.split()]) + np.cumsum([0]+[1]*(len(input_str.split())-1))][:-1]
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
 
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
@@ -179,10 +165,17 @@ def block_decipher_3(input_str: str, key:str, options: list[int]) -> str:
                 result.append(chr_str(block_permutation_inverse((arr[0] - prev_block) % 26)))
         prev_block = arr[0]
 
-    if options[0] == 0:
-        temp: list[str] = list(''.join(result))
-        for loc in spaces_locations:
-            temp.insert(loc, ' ')
-        return ''.join(temp)
-    else:
-        return ''.join(result)
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
+    
+def block_decipher_4(input_str: str, key:str, options: list[int]) -> str:
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
+
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
+
+    
+
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))

@@ -174,3 +174,22 @@ def block_cipher_3(input_str: str, key: str, options: list[int]) -> str:
                 result.append(chr_str(prev_block))
 
     return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str,list(''.join(result)))
+
+def block_cipher_4(input_str: str, key: str, options: list[int]) -> str:
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
+
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+    prev_block: np.ndarray[int]|None = None
+
+    key_length: int = len(key_str_num)
+    key_schedule: np.ndarray[int] = np.zeros((len(''.join(blocks)) + key_length), dtype=int)
+    key_schedule[:key_length] = key_str_num
+    for i in range(key_length, len(key_schedule)):
+        key_schedule[i] = np.sum(key_schedule[i-key_length:i],dtype=int)
+
+    print(key_schedule)
+
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str, list(''.join(result)))
