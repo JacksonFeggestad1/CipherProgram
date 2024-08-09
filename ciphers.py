@@ -182,14 +182,23 @@ def block_cipher_4(input_str: str, key: str, options: list[int]) -> str:
     blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
     blocks, num_blocks, key_str_num = blockify(input_str, key)
     result: list[str] = []
-    prev_block: np.ndarray[int]|None = None
 
     key_length: int = len(key_str_num)
     key_schedule: np.ndarray[int] = np.zeros((len(''.join(blocks)) + key_length), dtype=int)
     key_schedule[:key_length] = key_str_num
     for i in range(key_length, len(key_schedule)):
-        key_schedule[i] = np.sum(key_schedule[i-key_length:i],dtype=int)
+        key_schedule[i] = np.sum(key_schedule[i-key_length:i],dtype=int) % 26
 
-    print(key_schedule)
+    counter: int = 0
+    for arr in zip(num_blocks, blocks):
+        temp: np.ndarray = arr[0]
+        if len(arr[1]) < key_length:
+            for i in range(4):
+                temp = block_permutation(sigma_1(temp[:len(arr[1])] + key_schedule[key_length*(counter+1):key_length*(counter+1)+len(arr[1])] % 26) % 26)
+        else:
+            for i in range(4):
+                temp = block_permutation(sigma_1((temp + key_schedule[key_length*(counter+1):key_length*(counter+2)]) % 26) % 26)
+        counter += 1 
+        result.append(chr_str(temp))
 
     return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str, list(''.join(result)))

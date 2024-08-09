@@ -174,4 +174,6 @@ def sigma_1_inverse(input: np.ndarray[int]) -> np.ndarray[int]:
 
 # For Testing Purposes Only
 if __name__ == "__main__":
+    print(ord_str("word"))
+    print(blockify("word", "bbbb"))
     ...
