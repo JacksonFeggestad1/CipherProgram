@@ -149,9 +149,15 @@ def add_trackers(spaces_tracker: list[int]|None, grammar_tracker: list[tuple[str
 
 def sigma_1(input: np.ndarray[int]) -> np.ndarray[int]:
     result: np.ndarray[int] = np.zeros((len(input)),dtype=int)
-    result[:-1] = input[:-1] + input[1:]
-    result[-1] = input[-1]
-    result[1:] = result[1:] + input[:-1]
+    if len(input) > 2:
+        result[1:-1] = input[1:-1] + input[2:] + input[:-2]
+        result[-1] = input[-1]
+        result[0] = input[0]
+    elif len(input) == 2:
+        result[0] = input[0]
+        result[1] = input[1]
+    elif len(input) == 1:
+        result[0] = input[0]
     return result
 
 Mat: np.ndarray[int] = np.asarray([[]])
@@ -159,10 +165,11 @@ Mat_inv: np.ndarray[int] = np.asarray([[]])
 
 def sigma_1_inverse(input: np.ndarray[int]) -> np.ndarray[int]:
     global Mat, Mat_inv
+    if len(input) <= 2:
+        return input
     if len(Mat[0,:]) != len(input):
-        print("Creating New")
         Mat = np.zeros((len(input), len(input)), dtype=int)
-        Mat[0,0], Mat[0,1], Mat[-1,-1], Mat[-1,-2] = 1,1,1,1
+        Mat[0,0], Mat[-1,-1] = 1,1
         for i in range(1,len(input)-1):
             Mat[i, i] = 1
             Mat[i, i-1] = 1
@@ -174,6 +181,5 @@ def sigma_1_inverse(input: np.ndarray[int]) -> np.ndarray[int]:
 
 # For Testing Purposes Only
 if __name__ == "__main__":
-    print(ord_str("word"))
-    print(blockify("word", "bbbb"))
+    print(sigma_1_inverse(sigma_1(np.asarray([3, 4]))))
     ...
