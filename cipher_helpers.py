@@ -1,5 +1,6 @@
 import numpy as np
 import re
+from sympy import Matrix
 
 def blockify(input_str: str, key: str) -> tuple[list[str], np.ndarray[int], np.ndarray[int]]:
     '''Strip out all non_alphabetic characters'''
@@ -145,3 +146,32 @@ def add_trackers(spaces_tracker: list[int]|None, grammar_tracker: list[tuple[str
                 result[loc] = result[loc].upper() 
     
     return ''.join(result)
+
+def sigma_1(input: np.ndarray[int]) -> np.ndarray[int]:
+    result: np.ndarray[int] = np.zeros((len(input)),dtype=int)
+    result[:-1] = input[:-1] + input[1:]
+    result[-1] = input[-1]
+    result[1:] = result[1:] + input[:-1]
+    return result
+
+Mat: np.ndarray[int] = np.asarray([[]])
+Mat_inv: np.ndarray[int] = np.asarray([[]])
+
+def sigma_1_inverse(input: np.ndarray[int]) -> np.ndarray[int]:
+    global Mat, Mat_inv
+    if len(Mat[0,:]) != len(input):
+        print("Creating New")
+        Mat = np.zeros((len(input), len(input)), dtype=int)
+        Mat[0,0], Mat[0,1], Mat[-1,-1], Mat[-1,-2] = 1,1,1,1
+        for i in range(1,len(input)-1):
+            Mat[i, i] = 1
+            Mat[i, i-1] = 1
+            Mat[i, i+1] = 1
+        Mat_inv = np.asarray(Matrix(np.concatenate((Mat,np.identity(len(input), dtype=int)), axis=1,dtype=int)).rref()[0])[:,len(input):]
+
+    return Mat_inv @ input
+
+
+# For Testing Purposes Only
+if __name__ == "__main__":
+    ...
