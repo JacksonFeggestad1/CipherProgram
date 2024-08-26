@@ -1,4 +1,4 @@
-from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID, Text, IntVar, Checkbutton, Tk, Widget, Event, Button
+from tkinter import DISABLED, ACTIVE, END, Toplevel, Label, LEFT, SOLID, Text, IntVar, Checkbutton, Tk, Widget, Event, Button, Frame
 from typing import Callable
 from io import TextIOWrapper
 
@@ -43,10 +43,10 @@ class Tool_Tip(object):
 key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater.",
                         "Key should be a word\nof length four or greater.", "Key should be a word\nof length four or greater."]
 
-def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], deciphers: list[Callable],
+def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, central_frame: Frame, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], deciphers: list[Callable],
                     options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     output_field.delete('1.0','end')
-    hide_errors(error_label)
+    set_error_visibility(central_frame, error_label, False)
 
     options_vars: list[int] = [var.get() for var in options_vars]
 
@@ -61,7 +61,7 @@ def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, out
             else:
                 output_field.insert(END, deciphers[CIPHER_MODE](input_field.get('1.0','end'), key, options_vars))
         else:
-            raise_error(0, error_message, error_types, error_texts, error_label)
+            raise_error(central_frame, 0, error_message, error_types, error_texts, error_label)
     else:
         if CIPHER_DECIPHER:
             output_field.insert(END, ciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
@@ -69,9 +69,9 @@ def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, out
             output_field.insert(END, deciphers[CIPHER_MODE](input_field.get('1.0','end'),options_vars))
     return
 
-def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label, 
+def update_selection(left_frame: Frame, central_frame: Frame, selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label, 
                      options_gui_elements: list[Checkbutton], output_field: Text, cipher_options: list[str], error_types: list[str], error_texts: list[str], error_label: Label) -> tuple[int, bool]:
-    hide_errors(error_label)
+    set_error_visibility(central_frame, error_label, False)
 
     output_field.delete('1.0','end')
     key_field.delete('1.0','end')
@@ -85,13 +85,9 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
         NEED_KEY = True
 
     if NEED_KEY:
-        key_field.grid()
-        key_label.grid()
-        info_icon.grid()
+        set_key_visibility(left_frame, key_field, key_label, info_icon, True)
     else:
-        key_field.grid_remove()
-        key_label.grid_remove()
-        info_icon.grid_remove()
+        set_key_visibility(left_frame, key_field, key_label, info_icon, False)
 
     for elem in options_gui_elements:
         elem.deselect()
@@ -106,39 +102,35 @@ def update_selection(selection_str: str, CIPHER_MODE: int, NEED_KEY: bool, key_f
 
     return CIPHER_MODE, NEED_KEY
 
-def copy_output_to_clipboard(root: Tk, output_field: Text, error_label: list[Label]) -> None:
-    hide_errors(error_label)
+def copy_output_to_clipboard(root: Tk, central_frame: Frame, output_field: Text, error_label: Label) -> None:
+    set_error_visibility(central_frame, error_label, False)
     root.clipboard_clear()
     root.clipboard_append(output_field.get('1.0', 'end'))
     return
 
-def save_output_as_file(file_name: Text, output_field: Text, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
-    hide_errors(error_label)
+def save_output_as_file(central_frame: Frame, file_name: Text, output_field: Text, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
+    set_error_visibility(central_frame, error_label, False)
 
     file_name_str: str = file_name.get('1.0','end')[:-1]
     file: TextIOWrapper = open(file_name_str, "w")
     if file.closed:
-        raise_error(1,1,error_types, error_texts, error_label)
+        raise_error(central_frame, 1,1,error_types, error_texts, error_label)
         return 
     file.write(output_field.get('1.0','end'))
     file.close()
     return
 
-def input_to_output_copy(input_field: Text, output_field: Text, error_label: list[Label]) -> None:
-    hide_errors(error_label)
+def input_to_output_copy(central_frame: Frame, input_field: Text, output_field: Text, error_label: Label) -> None:
+    set_error_visibility(central_frame, error_label, False)
 
     input_field.delete('1.0','end')
     input_field.insert(END, output_field.get('1.0','end')[:-1])
     output_field.delete('1.0','end')
     return
 
-def hide_errors(error_label: Label) -> None:
-    error_label.grid_remove()
-    return
-
-def raise_error(error_type: int, error_message: int, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
+def raise_error(central_frame: Frame, error_type: int, error_message: int, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     error_label.config(text=f'{error_types[error_type]}\n\n{error_texts[error_message]}')
-    error_label.grid()
+    set_error_visibility(central_frame, error_label, True)
     return
 
 def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
@@ -163,7 +155,8 @@ def create_tool_tip(widget: Widget, text: str) -> Tool_Tip:
     widget.bind('<Leave>', leave)
     return tool_tip
 
-def toggle_cipher_decipher(toggle_button: Button, toggle_label: Label, CIPHER_DECIPHER: bool) -> bool:
+def toggle_cipher_decipher(central_frame: Frame, toggle_button: Button, toggle_label: Label, CIPHER_DECIPHER: bool, error_label: Label) -> bool:
+    set_error_visibility(central_frame, error_label, False)
     if CIPHER_DECIPHER:
         toggle_button.config(text = "Activate Cipher Mode")
         toggle_label.config(text = "Mode: Decipher")
@@ -171,3 +164,32 @@ def toggle_cipher_decipher(toggle_button: Button, toggle_label: Label, CIPHER_DE
         toggle_button.config(text = "Activate Decipher Mode")
         toggle_label.config(text = "Mode: Cipher")
     return not CIPHER_DECIPHER
+
+def set_key_visibility(left_frame: Frame, key_field: Text, key_label: Label, info_icon: Label, set_visible: bool) -> None:
+    if set_visible:
+        key_field.grid(row = 4, column = 0)
+        key_label.grid(row = 0, column = 0)
+        info_icon.grid(row = 0, column = 1)
+
+        field_height: int = key_field.winfo_reqheight()
+        label_height: int = key_label.winfo_reqheight()
+
+        left_frame.rowconfigure(3, minsize=label_height)
+        left_frame.rowconfigure(4, minsize=field_height)
+    else:
+        key_field.grid_remove()
+        info_icon.grid_remove()
+        key_label.grid_remove()
+    return
+
+def set_error_visibility(central_frame: Frame, error_label: Label, set_visible: bool) -> None:
+    if set_visible:
+        error_label.grid(row = 3, column = 0)
+
+        label_height: int = error_label.winfo_reqheight()
+
+        central_frame.rowconfigure(3, minsize=label_height)
+    else:
+        error_label.grid_remove()
+
+    return
