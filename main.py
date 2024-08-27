@@ -14,23 +14,22 @@ deciphers: list[Callable] = [position_decipher_1, decipher_by_cases_1, position_
 cipher_options: list[str] = ["Staircase Cipher", "Cipher in Parts", "Cycle Cipher", "Snowball Cipher", "Shuffle Cipher", "Shuffle Cipher II", "Touchy Cipher"]
 
 '''Helper is needed to assign new values to CIPHER_MODE and NEED_KEY'''
-def update_helper(selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,
+def update_helper(left_frame: Frame, central_frame: Frame, selection_str: str, key_field: Text, key_label: Label, key_info_display: Tool_Tip, info_icon: Label,
                   options_gui_elements: list[Checkbutton], output_field: Text, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
     global CIPHER_MODE, NEED_KEY, cipher_options
-    CIPHER_MODE, NEED_KEY = update_selection(selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_types, error_texts, error_label)
+    CIPHER_MODE, NEED_KEY = update_selection(left_frame, central_frame, selection_str, CIPHER_MODE, NEED_KEY, key_field, key_label, key_info_display, info_icon, options_gui_elements, output_field, cipher_options, error_types, error_texts, error_label)
     return
 
-def toggle_cipher_helper(toggle_button: Button, toggle_label: Label) -> None:
+def toggle_cipher_helper(central_frame: Frame, toggle_button: Button, toggle_label: Label, error_label: Label) -> None:
     global CIPHER_DECIPHER
-    CIPHER_DECIPHER = toggle_cipher_decipher(toggle_button, toggle_label, CIPHER_DECIPHER)
+    CIPHER_DECIPHER = toggle_cipher_decipher(central_frame, toggle_button, toggle_label, CIPHER_DECIPHER, error_label)
 
 def main() -> None:
     root: Tk = Tk()
     x:int; y:int
     x, y = 1000, 450
     root.geometry(f"{x}x{y}")
-    root.minsize(x, y)
-    root.maxsize(x, y)
+    root.minsize(880, 450)
 
     #-------------Frames--------------
     left_frame: Frame = Frame(root)
@@ -38,7 +37,7 @@ def main() -> None:
     right_frame: Frame = Frame(root)
 
     #-------Populate Left Frame-------
-    input_field: Text = Text(left_frame, height=10, width=40)
+    input_field: Text = Text(left_frame, height=10, width=33)
     input_field.insert(END, "Enter your input here.")
 
     input_label: Label = Label(left_frame, text="Input", font=("Impact",16))
@@ -56,7 +55,7 @@ def main() -> None:
 
     #-------Position Left Frame-------
 
-    left_frame.grid(row = 1, column = 0)
+    left_frame.grid(row = 1, column = 0, sticky='w',padx=20)
 
     #    <<<<<Left Frame>>>>>
 
@@ -65,18 +64,13 @@ def main() -> None:
     key_label_frame.grid(row = 3, column = 0)
 
     input_field.grid(row = 2, column = 0)
-    key_field.grid(row = 4, column = 0)
 
-    #    <<<<<Key Info Frame>>>>>
-
-    key_label.grid(row = 0, column = 0)
-
-    info_icon.grid(row = 0, column = 1)
+    set_key_visibility(left_frame, key_field, key_label, info_icon, True)
 
     #------Populate Central Frame-----
     cipher_frame: Frame = Frame(central_frame)
 
-    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, CIPHER_DECIPHER, output_field, input_field, key_field, ciphers, deciphers, options_vars, error_types, error_texts, error_label))
+    cipher_button: Button = Button(cipher_frame, text="Activate Cipher", command=lambda: activate_cipher(CIPHER_MODE, NEED_KEY, CIPHER_DECIPHER,central_frame, output_field, input_field, key_field, ciphers, deciphers, options_vars, error_types, error_texts, error_label))
 
     exit_button: Button = Button(central_frame, text = "Exit", command=root.quit)
 
@@ -84,11 +78,11 @@ def main() -> None:
 
     encrypt_decrypt_mode_label: Label = Label(encrypt_decrypt_frame, text = "Mode: Encrypt")
 
-    encrypt_decrypt_toggle_button: Button = Button(encrypt_decrypt_frame, text = "Activate Decipher Mode", command = lambda: toggle_cipher_helper(encrypt_decrypt_toggle_button, encrypt_decrypt_mode_label))
+    encrypt_decrypt_toggle_button: Button = Button(encrypt_decrypt_frame, text = "Activate Decipher Mode", command = lambda: toggle_cipher_helper(central_frame, encrypt_decrypt_toggle_button, encrypt_decrypt_mode_label, error_label))
 
     selected_cipher: StringVar = StringVar()
     selected_cipher.set(cipher_options[0])
-    cipher_selection: OptionMenu = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(x, key_field, key_label, key_info_display, info_icon, options_gui_elements,
+    cipher_selection: OptionMenu = OptionMenu(cipher_frame, selected_cipher, *cipher_options, command=lambda x: update_helper(left_frame, central_frame, x, key_field, key_label, key_info_display, info_icon, options_gui_elements,
                                                                                                                               output_field, error_types, error_texts, error_label))
 
     options_frame: Frame = Frame(central_frame)
@@ -116,13 +110,13 @@ def main() -> None:
 
     #    <<<<<Central Frame>>>>>
 
-    encrypt_decrypt_frame.grid(row = 0,column = 0, padx = (100,100))
+    encrypt_decrypt_frame.grid(row = 0,column = 0)
 
     cipher_frame.grid(row=1, column = 0, padx = (20, 20), pady = (50, 20))
 
     options_frame.grid(row = 2, column = 0)
 
-    error_label.grid(row = 3, column = 0)
+    set_error_visibility(central_frame, error_label, True)
 
     exit_button.grid(row = 4, column = 0, pady = (30, 0))
 
@@ -150,25 +144,25 @@ def main() -> None:
 
     output_label: Label = Label(right_frame, text="Output", font=("Impact", 16))
 
-    output_field: Text = Text(right_frame, height=10, width=40)
+    output_field: Text = Text(right_frame, height=10, width=33)
     output_field.insert(END, "Your output here.")
 
     output_save_frame: Frame = Frame(right_frame)
 
-    copy_button: Button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = lambda: copy_output_to_clipboard(root, output_field, error_label))
+    copy_button: Button = Button(output_save_frame, text = "Copy Output\nto Clipboard", command = lambda: copy_output_to_clipboard(root,central_frame, output_field, error_label))
 
     file_save_frame: Frame = Frame(output_save_frame)
 
     file_name: Text = Text(file_save_frame, height=1, width=10)
     file_name.insert(END, "File Name")
 
-    file_save_button: Button = Button(file_save_frame, text = "Save Output to File", command=lambda: save_output_as_file(file_name, output_field, error_types, error_texts, error_label))
+    file_save_button: Button = Button(file_save_frame, text = "Save Output to File", command=lambda: save_output_as_file(central_frame, file_name, output_field, error_types, error_texts, error_label))
 
-    output_to_input_button: Button = Button(output_save_frame, text = "Copy Output\nto Input", command = lambda: input_to_output_copy(input_field, output_field, error_label))
+    output_to_input_button: Button = Button(output_save_frame, text = "Copy Output\nto Input", command = lambda: input_to_output_copy(central_frame, input_field, output_field, error_label))
 
     #-------Position Right Frame------
 
-    right_frame.grid(row = 1, column = 2)
+    right_frame.grid(row = 1, column = 2, sticky='e',padx=20)
 
     #    <<<<<Right Frame>>>>>
     output_label.grid(row = 1, column = 0)
@@ -195,10 +189,12 @@ def main() -> None:
 
 
     #------Make Things Invisible------
-    key_field.grid_remove()
-    key_label.grid_remove()
-    info_icon.grid_remove()
-    error_label.grid_remove()
+    set_key_visibility(left_frame, key_field, key_label, info_icon, False)
+    set_error_visibility(central_frame, error_label, False)
+
+    root.columnconfigure(0,weight=1)
+    root.columnconfigure(1,weight=1)
+    root.columnconfigure(2,weight=1)
 
     root.mainloop()
     return
