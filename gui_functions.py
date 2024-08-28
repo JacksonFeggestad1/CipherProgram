@@ -41,7 +41,7 @@ class Tool_Tip(object):
 
 
 key_info: list[str] = ["No Key Needed.", "No Key Needed.", "The key should be an integer.\nLarge key values will have a minimal\neffect on small plaintexts.", "Key should be an integer.", "Key should be a word\nof length four or greater.",
-                        "Key should be a word\nof length four or greater.", "Key should be a word\nof length four or greater."]
+                        "Key should be a word\nof length four or greater.", "Key should be a word\nof length four or greater.", "Key should be a word\nof length four or greater."]
 
 def activate_cipher(CIPHER_MODE: int, NEED_KEY: bool, CIPHER_DECIPHER: bool, central_frame: Frame, output_field: Text, input_field: Text, key_field: Text, ciphers: list[Callable], deciphers: list[Callable],
                     options_vars: list[IntVar], error_types: list[str], error_texts: list[str], error_label: Label) -> None:
@@ -81,7 +81,7 @@ def update_selection(left_frame: Frame, central_frame: Frame, selection_str: str
 
     if CIPHER_MODE in [0,1]:
         NEED_KEY = False
-    elif CIPHER_MODE in [2,3,4,5,6]:
+    elif CIPHER_MODE in [2,3,4,5,6,7]:
         NEED_KEY = True
 
     if NEED_KEY:
@@ -138,7 +138,7 @@ def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
         return True, -1
     elif CIPHER_MODE in [2,3]:
         return key.isnumeric(), 0
-    elif CIPHER_MODE in [4,5,6]:
+    elif CIPHER_MODE in [4,5,6,7]:
         for char in key:
             if (ord(char) > 122 and ord(char) < 97) and (ord(char) > 90 and ord(char) < 65):
                 return False, 2

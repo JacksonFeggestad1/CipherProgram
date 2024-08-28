@@ -203,3 +203,15 @@ def block_cipher_4(input_str: str, key: str, options: list[int]) -> str:
         result.append(chr_str(temp))
 
     return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str, list(''.join(result)))
+
+def block_cipher_5(input_str: str, key: str, options: list[int]) -> str:
+    spaces_tracker: list[int];grammar_tracker: list[tuple[str, int]];capitals_tracker: list[int]
+    spaces_tracker, grammar_tracker, capitals_tracker = get_trackers(input_str, options)
+
+    blocks: list[str]; num_blocks: np.ndarray[int]; key_str_num: np.ndarray[int]
+    blocks, num_blocks, key_str_num = blockify(input_str, key)
+    result: list[str] = []
+
+    
+
+    return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str, list(''.join(result)))
