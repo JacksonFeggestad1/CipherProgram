@@ -112,9 +112,9 @@ def main() -> None:
 
     encrypt_decrypt_frame.grid(row = 0,column = 0)
 
-    cipher_frame.grid(row=1, column = 0, padx = (20, 20), pady = (50, 20))
+    cipher_frame.grid(row=1, column = 0, pady = (50, 20))
 
-    options_frame.grid(row = 2, column = 0)
+    options_frame.grid(row = 2, column = 0, padx = (20, 20))
 
     set_error_visibility(central_frame, error_label, True)
 
