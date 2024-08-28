@@ -129,8 +129,8 @@ def input_to_output_copy(central_frame: Frame, input_field: Text, output_field: 
     return
 
 def raise_error(central_frame: Frame, error_type: int, error_message: int, error_types: list[str], error_texts: list[str], error_label: Label) -> None:
-    error_label.config(text=f'{error_types[error_type]}\n\n{error_texts[error_message]}')
     set_error_visibility(central_frame, error_label, True)
+    error_label.config(text=f'{error_types[error_type]}\n\n{error_texts[error_message]}')
     return
 
 def validate_key(CIPHER_MODE: int, key: str) -> tuple[bool, int]:
@@ -185,7 +185,7 @@ def set_key_visibility(left_frame: Frame, key_field: Text, key_label: Label, inf
 def set_error_visibility(central_frame: Frame, error_label: Label, set_visible: bool) -> None:
     if set_visible:
         error_label.grid(row = 3, column = 0)
-
+        error_label.config(text=f'\n\n\n\n\n')
         label_height: int = error_label.winfo_reqheight()
 
         central_frame.rowconfigure(3, minsize=label_height)

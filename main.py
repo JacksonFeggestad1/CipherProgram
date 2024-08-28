@@ -118,7 +118,7 @@ def main() -> None:
 
     set_error_visibility(central_frame, error_label, True)
 
-    exit_button.grid(row = 4, column = 0, pady = (30, 0))
+    exit_button.grid(row = 4, column = 0)
 
     #    <<<<<Cipher Frame>>>>>
 
