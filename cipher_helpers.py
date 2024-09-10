@@ -17,67 +17,6 @@ def blockify(input_str: str, key: str) -> tuple[list[str], np.ndarray[int], np.n
 
     return blocks, num_blocks, key_str_num
 
-
-def block_permutation(input_str: np.ndarray[int]) -> np.ndarray:
-    input_length: int = len(input_str)
-    result: np.ndarray[int] = np.zeros((input_length),dtype=int)
-    input: list[int] = list(input_str)
-
-    if input_length % 4 == 0:
-        for i in range(0, input_length, 4):
-            result[i] = input[i+1]
-            result[i+1] = input[i+3]
-            result[i+2] = input[i]
-            result[i+3] = input[i+2]
-    else:
-        for i in range(0, (input_length//4)*4, 4):
-            result[i] = input[i+1]
-            result[i+1] = input[i+3]
-            result[i+2] = input[i]
-            result[i+3] = input[i+2]
-        
-        if input_length % 4 == 1:
-            result[-1] = input[-1]
-        elif input_length % 4 == 2:
-            result[-1] = input[-2]
-            result[-2] = input[-1]
-        elif input_length % 4 == 3:
-            result[-1] = input[-3]
-            result[-2] = input[-1]
-            result[-3] = input[-2]
-
-    return result
-
-def block_permutation_inverse(input_str: np.ndarray) -> np.ndarray:
-    input_length: int = len(input_str)
-    result: np.ndarray[int] = np.zeros((input_length),dtype=int)
-    input: list[int] = list(input_str)
-
-    if input_length % 4 == 0:
-        for i in range(0, input_length, 4):
-            result[i] = input[i+2]
-            result[i+1] = input[i]
-            result[i+2] = input[i+3]
-            result[i+3] = input[i+1]
-    else:
-        for i in range(0, (input_length//4)*4, 4):
-            result[i] = input[i+2]
-            result[i+1] = input[i]
-            result[i+2] = input[i+3]
-            result[i+3] = input[i+1]
-        
-        if input_length % 4 == 1:
-            result[-1] = input[-1]
-        elif input_length % 4 == 2:
-            result[-1] = input[-2]
-            result[-2] = input[-1]
-        elif input_length % 4 == 3:
-            result[-1] = input[-2]
-            result[-2] = input[-3]
-            result[-3] = input[-1]
-
-    return result
-
 def ord_str(input_str: str) -> np.ndarray[int]:
     result: np.ndarray[int] = np.zeros(len(input_str), dtype=int)
     counter: int = 0
@@ -168,6 +107,90 @@ def sigma_1_inverse(input: np.ndarray[int]) -> np.ndarray[int]:
         Mat_inv = np.asarray(Matrix(np.concatenate((Mat,np.identity(len(input), dtype=int)), axis=1,dtype=int)).rref()[0])[:,len(input):]
     return Mat_inv @ input
 
+def block_permutation(input: np.ndarray) -> np.ndarray:
+    input_length: int = len(input)
+    result: np.ndarray[int] = np.zeros((input_length),dtype=int)
+
+    for i in range(0, (input_length//4)*4, 4):
+        result[i],result[i+1],result[i+2],result[i+3] = input[i+1],input[i+3],input[i],input[i+2]
+    
+    if input_length % 4 == 1:
+        result[-1] = input[-1]
+    elif input_length % 4 == 2:
+        result[-1],result[-2] = input[-2],input[-1]
+    elif input_length % 4 == 3:
+        result[-1],result[-2],result[-3] = input[-3],input[-1],input[-2]
+
+    return result
+
+def block_permutation_inverse(input: np.ndarray) -> np.ndarray:
+    input_length: int = len(input)
+    result: np.ndarray[int] = np.zeros((input_length),dtype=int)
+
+    for i in range(0, (input_length//4)*4, 4):
+        result[i],result[i+1],result[i+2],result[i+3] = input[i+2],input[i],input[i+3],input[i+1]
+
+    if input_length % 4 == 1:
+        result[-1] = input[-1]
+    elif input_length % 4 == 2:
+        result[-1],result[-2] = input[-2],input[-1]
+    elif input_length % 4 == 3:
+        result[-1],result[-2],result[-3] = input[-2],input[-3],input[-1]
+
+    return result
+
+def block_permutation_2(input: np.ndarray) -> np.ndarray:
+    input_length: int = len(input)
+    result = np.zeros((input_length), dtype=int)
+
+    for i in range(0, (input_length//5)*5, 5):
+        result[i],result[i+1],result[i+2],result[i+3],result[i+4] = input[i+2],input[i+4],input[i+3],input[i],input[i+1]
+
+    if input_length % 5 == 1:
+        result[-1] = input[-1]
+    elif input_length % 5 == 2:
+        result[-1],result[-2] = input[-2],input[-1]
+    elif input_length % 5 == 3:
+        result[-1],result[-2],result[-3] = input[-2],input[-3],input[-1]
+    elif input_length % 5 == 4:
+        result[-1],result[-2],result[-3],result[-4] = input[-4],input[-3],input[-2],input[-1]
+    
+    return result
+
+def block_permutation_inverse_2(input: np.ndarray) -> np.ndarray:
+    input_length: int = len(input)
+    result = np.zeros((input_length), dtype=int)
+
+    for i in range(0, (input_length//5)*5, 5):
+        result[i],result[i+1],result[i+2],result[i+3],result[i+4] = input[i+3],input[i+4],input[i],input[i+2],input[i+1]
+
+    if input_length % 5 == 1:
+        result[-1] = input[-1]
+    elif input_length % 5 == 2:
+        result[-1],result[-2] = input[-2],input[-1]
+    elif input_length % 5 == 3:
+        result[-1],result[-2],result[-3] = input[-3],input[-1],input[-2]
+    elif input_length % 5 == 4:
+        result[-1],result[-2],result[-3],result[-4] = input[-4],input[-3],input[-2],input[-1]
+
+    return result
+
+# This function is it's own inverse
+def block_permutation_3(input: np.ndarray) -> np.ndarray:
+    input_length: int = len(input)
+    result = np.zeros((input_length),dtype=int)
+
+    for i in range(0, (input_length//4)*4, 4):
+        result[i],result[i+1],result[i+2],result[i+3] = input[i+2],input[i+3],input[i],input[i+1]
+
+    if input_length % 4 == 1:
+        result[-1] = input[-1]
+    elif input_length % 4 == 2:
+        result[-1],result[-2] = input[-2],input[-1]
+    elif input_length % 4 == 3:
+        result[-1],result[-2],result[-3] = input[-2],input[-1],input[-3]
+
+    return result
 
 # For Testing Purposes Only
 if __name__ == "__main__":
