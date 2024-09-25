@@ -212,6 +212,20 @@ def block_cipher_5(input_str: str, key: str, options: list[int]) -> str:
     blocks, num_blocks, key_str_num = blockify(input_str, key)
     result: list[str] = []
 
+    cipher_text: np.ndarray[int] = np.zeros((len(num_blocks)),dtype=int)
+
+    key_length: int = len(key_str_num)
+    key_schedule: np.ndarray[int] = np.zeros((len(''.join(blocks)) + key_length), dtype=int)
+    key_schedule[:key_length] = key_str_num
+    key_schedule[(key_length):(2*key_length)] = block_permutation_2(sigma_1(key_str_num))
+    for i in range(key_length*2, len(key_schedule), key_length):
+        key_schedule[i:(key_length + i)] = block_permutation_2(block_permutation_2(key_schedule[(i-key_length):i]) + cipher_text[(i-key_length):i])
+
     
 
+
     return add_trackers(spaces_tracker, grammar_tracker, capitals_tracker, input_str, list(''.join(result)))
+
+# For testing purposes only
+if __name__ == '__main__':
+    ...
