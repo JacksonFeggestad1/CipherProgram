@@ -1,9 +1,9 @@
 from tkinter import *
 from typing import Callable
-from PIL import Image, ImageTk
 from ciphers import *
 from deciphers import *
 from gui_functions import *
+from info_windows import *
 
 CIPHER_MODE: int = 0
 NEED_KEY: bool = False
@@ -30,6 +30,7 @@ def main() -> None:
     x, y = 1000, 450
     root.geometry(f"{x}x{y}")
     root.minsize(880, 450)
+    root.title("Ed's Cipher Machine")
 
     #-------------Frames--------------
     left_frame: Frame = Frame(root)
@@ -49,7 +50,7 @@ def main() -> None:
 
     key_label: Label = Label(key_label_frame, text="Key", font=("Impact", 13))
 
-    info_img: ImageTk = ImageTk.PhotoImage(Image.open("icons/info_icon.png"))
+    info_img: PhotoImage = PhotoImage(file='icons/info_icon.png')
     info_icon: Label = Label(key_label_frame, image = info_img)
     key_info_display: Tool_Tip = create_tool_tip(info_icon, text = key_info[CIPHER_MODE])
 
@@ -187,6 +188,17 @@ def main() -> None:
     title_label: Label = Label(root, text="Welcom to Ed's \nCipher Machine!", font=("Impact", 30))
     title_label.grid(row = 0, column = 1)
 
+    #----------Info Buttons-----------
+
+    info_frame: Frame = Frame(root)
+
+    cipher_info_label: Label = Label(info_frame, text = "What is a Cipher?")
+    cipher_info_button: Button = Button(info_frame, text = "Find Out Here", command=lambda: create_cipher_info_window(root))
+
+
+    info_frame.grid(row = 0, column = 0)
+    cipher_info_label.grid(row = 0, column = 0)
+    cipher_info_button.grid(row = 0, column = 1)
 
     #------Make Things Invisible------
     set_key_visibility(left_frame, key_field, key_label, info_icon, False)
